@@ -10,12 +10,14 @@ def get_binance_client():
             'secret': BINANCE_API_SECRET,
             'urls': {
                 'api': 'https://testnet.binance.vision/api',  # Testnet API URL
-            }
+            },
+            'timeout': 30 * 1000,  # Tempo limite aumentado para 30 segundos
         })
     else:
         return ccxt.binance({
             'apiKey': BINANCE_API_KEY,
-            'secret': BINANCE_API_SECRET
+            'secret': BINANCE_API_SECRET,
+            'timeout': 30 * 1000,  # Tempo limite aumentado para 30 segundos
         })
 
 def get_last_price(symbol="BTC/USDT"):
