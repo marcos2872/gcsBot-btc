@@ -1,3 +1,5 @@
+#src/transactions.py
+
 import csv
 import datetime
 import os
@@ -12,7 +14,7 @@ def registrar_transacao(tipo, simbolo, quantidade, saldo_btc, saldo_usdt):
     client = BinanceClient()
     preco_atual = client.get_current_price(simbolo)
 
-    # Verificar se o arquivo já existe e adicionar o cabeçalho apenas na primeira vez
+    # Registrar transação no log
     file_exists = os.path.exists('data/transacoes.csv')
 
     with open('data/transacoes.csv', mode='a', newline='') as file:

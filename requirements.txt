@@ -1,9 +1,7 @@
+# requirements.txt
 python-binance
 pandas
 scikit-learn
 numpy
-matplotlib
-gym
-stable-baselines3
-shimmy>=2.0
-dotenv
+python-dotenv
+joblib

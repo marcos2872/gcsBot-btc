@@ -1,103 +1,129 @@
+# src/client.py
 import csv
 import os
 import time
 from binance.client import Client
 from .config import API_KEY, API_SECRET, TESTNET_API_KEY, TESTNET_API_SECRET, USE_TESTNET
 from binance.exceptions import BinanceAPIException
+from .logger import logger
 
 class BinanceClient:
     def __init__(self):
-        # Usar Testnet ou Rede Real baseado na variável USE_TESTNET
         if USE_TESTNET:
-            self.client = Client(TESTNET_API_KEY, TESTNET_API_SECRET, {"timeout": 60})
-            # Modificando a URL base para a Testnet
-            self.client.session.base_url = "https://testnet.binance.vision/api"
-            print("Conectando à Binance Testnet")
-        else:
-            self.client = Client(API_KEY, API_SECRET, {"timeout": 60})
-            print("Conectando à Binance Rede Real")
-
-        try:
-            # Acessando o cliente corretamente
-            self.client.ping()
-            print("Conexão bem-sucedida com a API da Binance!")
-        except Exception as e:
-            print(f"Erro ao conectar à API da Binance: {e}")
-
-    def get_local_timestamp(self):
-        """Retorna o timestamp local ajustado para 1 minuto atrás"""
-        current_timestamp = int(time.time() * 1000)  # Timestamp local em milissegundos
-        adjusted_timestamp = current_timestamp - 60 * 1000  # Ajusta para 1 minuto atrás
-        return adjusted_timestamp
-
-    def place_order(self, symbol, side, quantity):
-        """Faz uma ordem de compra/venda com timestamp ajustado"""
-        try:
-            # Usa o timestamp local ajustado para 1 minuto atrás
-            timestamp = self.get_local_timestamp()  # Ajuste o timestamp para 1 minuto atrás
+            if not TESTNET_API_KEY or not TESTNET_API_SECRET:
+                raise ValueError("Chaves da Testnet não configuradas no arquivo .env")
             
-            params = {
-                'symbol': symbol,
-                'side': side,
-                'quantity': quantity,
-                'timestamp': timestamp
-            }
-            if side == 'buy':
-                return self.client.order_market_buy(**params)
-            elif side == 'sell':
-                return self.client.order_market_sell(**params)
-        except BinanceAPIException as e:
-            print(f"Erro ao fazer o pedido: {e}")
+            self.client = Client(
+                TESTNET_API_KEY, 
+                TESTNET_API_SECRET,
+                testnet=True  # Parâmetro correto para testnet
+            )
+            logger.info("✅ Conectado à Binance Testnet")
+        else:
+            if not API_KEY or not API_SECRET:
+                raise ValueError("Chaves da API real não configuradas no arquivo .env")
+            
+            self.client = Client(API_KEY, API_SECRET)
+            logger.info("✅ Conectado à Binance Rede Real")
+
+        # Testar conexão
+        try:
+            self.client.ping()
+            logger.info("✅ Ping bem-sucedido!")
+            
+            # Testar acesso à conta
+            account_info = self.client.get_account()
+            logger.info(f"✅ Acesso à conta confirmado - Tipo: {account_info.get('accountType', 'N/A')}")
+            
+        except Exception as e:
+            logger.error(f"❌ Erro ao conectar: {e}")
+            raise
 
     def get_current_price(self, symbol):
         """Retorna o preço atual do ativo"""
-        ticker = self.client.get_symbol_ticker(symbol=symbol)
-        return float(ticker['price'])
+        try:
+            ticker = self.client.get_symbol_ticker(symbol=symbol)
+            return float(ticker['price'])
+        except Exception as e:
+            logger.error(f"Erro ao obter preço de {symbol}: {e}")
+            raise
 
     def get_balance(self, asset='USDT'):
         """Retorna o saldo disponível do ativo"""
-        balance = self.client.get_asset_balance(asset=asset)
-        return float(balance['free'])
+        try:
+            account = self.client.get_account()
+            for balance in account['balances']:
+                if balance['asset'] == asset:
+                    return float(balance['free'])
+            return 0.0
+        except Exception as e:
+            logger.error(f"Erro ao obter saldo de {asset}: {e}")
+            raise
 
-    def get_historical_data(self, symbol, interval='1h', limit=1000):
-        """Obter dados históricos para treinar o modelo de ML"""
-        # Aguardar antes de fazer a próxima requisição
-        time.sleep(1)  # Aguarda 1 segundo entre as requisições
-        
-        # Coleta os dados históricos
-        klines = self.client.get_historical_klines(symbol, interval, f"{limit} hours ago UTC")
+    def place_order(self, symbol, side, quantity):
+        """Executa ordem de mercado (apenas para testnet)"""
+        try:
+            if not USE_TESTNET:
+                logger.warning("⚠️ Ordem bloqueada - não está em modo testnet")
+                return None
+                
+            # Formatar quantidade para 8 casas decimais
+            quantity = round(float(quantity), 8)
+            
+            if side.upper() == 'BUY':
+                order = self.client.order_market_buy(
+                    symbol=symbol,
+                    quantity=quantity
+                )
+            elif side.upper() == 'SELL':
+                order = self.client.order_market_sell(
+                    symbol=symbol,
+                    quantity=quantity
+                )
+            
+            logger.info(f"✅ Ordem executada: {side} {quantity} {symbol}")
+            return order
+            
+        except BinanceAPIException as e:
+            logger.error(f"❌ Erro na ordem: {e}")
+            return None
 
-        # Prepara os dados para salvar no CSV
-        dados = []
-        for kline in klines:
-            timestamp = kline[0]
-            open_price = float(kline[1])
-            high = float(kline[2])
-            low = float(kline[3])
-            close = float(kline[4])
-            volume = float(kline[5])
+    def get_historical_data(self, symbol, interval='1h', limit=100):
+        """Obter dados históricos"""
+        try:
+            klines = self.client.get_historical_klines(
+                symbol, interval, f"{limit} hours ago UTC"
+            )
+            
+            dados = []
+            for kline in klines:
+                dados.append({
+                    'timestamp': int(kline[0]),
+                    'open': float(kline[1]),
+                    'high': float(kline[2]),
+                    'low': float(kline[3]),
+                    'close': float(kline[4]),
+                    'volume': float(kline[5])
+                })
+            
+            return dados
+        except Exception as e:
+            logger.error(f"Erro ao obter dados históricos: {e}")
+            return []
 
-            dados.append([timestamp, open_price, high, low, close, volume])
-        
-        return dados
-
-    def save_historical_data(self, symbol, interval='1h', limit=1000):
-        """Salva os dados históricos no arquivo CSV"""
+    def save_historical_data(self, symbol, interval='1h', limit=100):
+        """Salva dados históricos em CSV"""
         dados = self.get_historical_data(symbol, interval, limit)
-
-        # Verificar se o diretório 'data' existe, caso contrário, cria
-        if not os.path.exists('data'):
-            os.makedirs('data')
-
-        # Verificar se o arquivo já existe e adicionar o cabeçalho apenas na primeira vez
-        file_exists = os.path.exists('data/treinamento.csv')
-
-        with open('data/treinamento.csv', mode='a', newline='') as file:
-            writer = csv.writer(file)
-
-            # Adicionar o cabeçalho se for o primeiro registro
-            if not file_exists:
-                writer.writerow(['Timestamp', 'Open', 'High', 'Low', 'Close', 'Volume'])
-
-            # Escrever os dados históricos
+        
+        if not dados:
+            logger.warning("Nenhum dado histórico obtido")
+            return
+        
+        os.makedirs('data', exist_ok=True)
+        
+        with open('data/historical_data.csv', 'w', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+            writer.writeheader()
             writer.writerows(dados)
+        
+        logger.info(f"✅ {len(dados)} registros salvos em data/historical_data.csv")
