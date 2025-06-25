@@ -8,7 +8,7 @@ if __name__ == "__main__":
         bot = TradingBot()
         
         # Executar 1 ciclo (para teste)
-        bot.run(cycles=1)
+        bot.run(cycles=1000)
         
         # Para execução contínua, descomente a linha abaixo:
         # bot.run(cycles=24, interval_minutes=60)  # 24 horas, 1 hora por ciclo
