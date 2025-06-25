@@ -7,226 +7,157 @@ import json
 from src.client import BinanceClient
 from src.ml_trading import MLTrader
 from src.logger import logger
-from src.config import (
-    SYMBOL,
-    SIMULATION_MODE,
-    SIMULATION_INITIAL_USDT,
-    SIMULATION_INITIAL_BTC,
-    SIMULATION_TRADE_RATIO
-)
+from src.config import SYMBOL, SIMULATION_MODE, SIMULATION_INITIAL_USDT, SIMULATION_INITIAL_BTC
 
 class TradingBot:
-    # A função __init__ e outras funções de estado (load, save, log)
-    # permanecem as mesmas da versão anterior.
     def __init__(self):
-        self.symbol = SYMBOL
         self.client = BinanceClient()
         self.ml_model = MLTrader()
         
-        self.state_filepath = 'data/simulation_state.json'
-        
-        self.simulation_mode = SIMULATION_MODE
         self.usdt_balance = SIMULATION_INITIAL_USDT
         self.btc_balance = SIMULATION_INITIAL_BTC
-        self.trade_ratio = SIMULATION_TRADE_RATIO
-        self.last_buy_price = 0.0
-
-        self.dynamic_profit_target = 0.0
-        self.dynamic_stop_loss = 0.0
+        self.average_cost_price = 0.0
+        self.last_sell_price = 0.0
         
-        self.load_state()
+        # --- PARÂMETROS HIPER-AGRESSIVOS ---
+        self.trade_ratio = 0.15 # Aumentado para 15% do saldo por operação
+        self.base_profit_target = 0.0012 # Alvo de lucro base de 0.12% (muito sensível)
+        self.base_dip_target = 0.0018    # Alvo de queda base para compra de 0.18%
+        self.rebuy_dip_target = 0.001    # Recompra com apenas 0.1% de queda após a venda
 
+        self.state_filepath = 'data/simulation_state.json'
         self.trades_log_file = 'data/trades.csv'
+        self.load_state()
         self._initialize_trade_log()
 
     def load_state(self):
-        if not self.simulation_mode: return
-        try:
-            if os.path.exists(self.state_filepath):
-                with open(self.state_filepath, 'r') as f:
-                    state = json.load(f)
-                    self.usdt_balance = state.get('usdt_balance', self.usdt_balance)
-                    self.btc_balance = state.get('btc_balance', self.btc_balance)
-                    self.last_buy_price = state.get('last_buy_price', self.last_buy_price)
-                    self.dynamic_profit_target = state.get('dynamic_profit_target', 0.0)
-                    self.dynamic_stop_loss = state.get('dynamic_stop_loss', 0.0)
-                    logger.info(f"✅ Estado da simulação carregado: USDT: {self.usdt_balance:.4f}, BTC: {self.btc_balance:.8f}")
-            else:
-                logger.info("Nenhum estado de simulação guardado encontrado. A começar com valores iniciais.")
-        except Exception as e:
-            logger.error(f"Erro ao carregar o estado da simulação: {e}. A usar valores padrão.")
+        if not os.path.exists(self.state_filepath): return
+        with open(self.state_filepath, 'r') as f:
+            state = json.load(f)
+            self.usdt_balance = state.get('usdt_balance', self.usdt_balance)
+            self.btc_balance = state.get('btc_balance', self.btc_balance)
+            self.average_cost_price = state.get('average_cost_price', self.average_cost_price)
+            self.last_sell_price = state.get('last_sell_price', self.last_sell_price)
+            logger.info(f"✅ Estado carregado. Custo Médio: ${self.average_cost_price:,.2f}")
 
     def save_state(self):
-        if not self.simulation_mode: return
         state = {
             'usdt_balance': self.usdt_balance,
             'btc_balance': self.btc_balance,
-            'last_buy_price': self.last_buy_price,
-            'dynamic_profit_target': self.dynamic_profit_target,
-            'dynamic_stop_loss': self.dynamic_stop_loss
+            'average_cost_price': self.average_cost_price,
+            'last_sell_price': self.last_sell_price
         }
-        try:
-            with open(self.state_filepath, 'w') as f:
-                json.dump(state, f, indent=4)
-        except Exception as e:
-            logger.error(f"Erro ao guardar o estado da simulação: {e}")
+        with open(self.state_filepath, 'w') as f: json.dump(state, f, indent=4)
 
     def _initialize_trade_log(self):
         if not os.path.exists(self.trades_log_file):
             with open(self.trades_log_file, 'w', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow(['timestamp', 'type', 'reason', 'price', 'quantity_btc', 'value_usdt', 'portfolio_value_usdt', 'profit_target', 'stop_loss_target'])
+                csv.writer(f).writerow(['timestamp', 'type', 'reason', 'price', 'btc_qty', 'usdt_value', 'avg_cost', 'portfolio_value'])
 
-    def _log_trade(self, trade_type, reason, price, btc_qty, usdt_value):
-        portfolio_value = self.usdt_balance + (self.btc_balance * price)
-        timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+    def _log_trade(self, t_type, reason, price, btc, usdt):
+        portfolio = self.usdt_balance + (self.btc_balance * price)
         with open(self.trades_log_file, 'a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow([timestamp, trade_type, reason, f"{price:,.4f}", f"{btc_qty:.8f}", f"{usdt_value:,.4f}", f"{portfolio_value:,.4f}", f"{self.dynamic_profit_target:.4f}", f"{self.dynamic_stop_loss:.4f}"])
-
+            csv.writer(f).writerow([time.strftime('%Y-%m-%d %H:%M:%S'), t_type, reason, f"{price:,.2f}", f"{btc:.8f}", f"{usdt:,.2f}", f"{self.average_cost_price:,.2f}", f"{portfolio:,.2f}"])
 
     def initialize(self):
-        logger.info("🚀 A inicializar o Trading Bot...")
-        if self.simulation_mode:
-            logger.info("--- MODO DE SIMULAÇÃO ATIVADO ---")
-            logger.info(f"💰 Saldo Atual da Carteira - USDT: {self.usdt_balance:.4f}, BTC: {self.btc_balance:.8f}")
-        else:
-            self.usdt_balance = self.client.get_balance('USDT')
-            self.btc_balance = self.client.get_balance('BTC')
-
-        logger.info("📊 A atualizar a base de dados históricos...")
-        self.client.update_historical_data(self.symbol, '1h', initial_limit=300)
-        
-        if self.last_buy_price == 0.0 and self.btc_balance > 0:
-            self.last_buy_price = self.client.get_current_price(self.symbol)
-            logger.info(f"Preço de referência (última compra) não encontrado. Definido para o preço atual: ${self.last_buy_price:,.2f}")
-
-        logger.info("🧠 A carregar/treinar o modelo ML...")
+        logger.info("🚀 A inicializar o Trader Adaptativo de Alta Frequência...")
+        self.client.update_historical_data(SYMBOL, '1h', 300)
         try:
             historical_data = pd.read_csv('data/historical_data.csv')
             if not self.ml_model.load_model():
-                logger.info("Modelo não encontrado. A treinar um novo modelo...")
                 self.ml_model.train(historical_data)
-        except FileNotFoundError:
-            logger.error("Falha crítica: ficheiro de dados históricos não encontrado.")
-            raise
-        
-        logger.info("✅ Bot inicializado com sucesso!")
-
-    # --- LÓGICA DE DECISÃO COM TRAVA DE SEGURANÇA ---
-    def execute_action(self, current_price, features):
-        final_decision = 'HOLD'
-        decision_reason = "Aguardando condições ideais."
-
-        if self.btc_balance > 0.00001:
-            if current_price >= self.dynamic_profit_target:
-                final_decision = 'SELL'
-                decision_reason = "Take-Profit Dinâmico Atingido"
-            
-            elif current_price <= self.dynamic_stop_loss:
-                final_decision = 'SELL'
-                decision_reason = "Stop-Loss Dinâmico Acionado"
-            
-            else:
-                 profit_pct = (current_price - self.last_buy_price) / self.last_buy_price * 100
-                 decision_reason = f"Posição Aberta. Lucro: {profit_pct:.3f}%. Alvo: ${self.dynamic_profit_target:,.2f}"
-        else:
-            final_decision = 'BUY'
-            decision_reason = "Iniciando nova operação."
-
-        logger.info(f"🎯 Decisão Final: {final_decision} | Razão: {decision_reason}")
-
-        if final_decision == 'BUY' and self.usdt_balance > 10:
-            usdt_to_spend = self.usdt_balance * self.trade_ratio
-            if usdt_to_spend < 10: usdt_to_spend = 10
-
-            btc_bought = usdt_to_spend / current_price
-            self.usdt_balance -= usdt_to_spend
-            self.btc_balance += btc_bought
-            self.last_buy_price = current_price
-
-            try:
-                targets = self.ml_model.predict(features)
-                if targets:
-                    predicted_profit_target = targets['profit_target_price']
-                    predicted_stop_loss = targets['stop_loss_price']
-
-                    # --- SANITY CHECK (A TRAVA DE SEGURANÇA) ---
-                    # 1. O alvo de lucro DEVE ser maior que o preço de compra.
-                    if predicted_profit_target > self.last_buy_price:
-                        self.dynamic_profit_target = predicted_profit_target
-                    else:
-                        # Fallback: Se o ML errar, define uma meta de lucro mínima de 0.1%
-                        self.dynamic_profit_target = self.last_buy_price * 1.001
-                        logger.warning(f"ML previu lucro inválido (${predicted_profit_target:,.2f}). Usando meta de fallback: ${self.dynamic_profit_target:,.2f}")
-
-                    # 2. O alvo de stop DEVE ser menor que o preço de compra.
-                    if predicted_stop_loss < self.last_buy_price:
-                        self.dynamic_stop_loss = predicted_stop_loss
-                    else:
-                        # Fallback: Se o ML errar, define um stop mínimo de 0.2%
-                        self.dynamic_stop_loss = self.last_buy_price * 0.998
-                        logger.warning(f"ML previu stop inválido (${predicted_stop_loss:,.2f}). Usando meta de fallback: ${self.dynamic_stop_loss:,.2f}")
-                else:
-                    raise ValueError("Previsão do ML retornou None")
-            except Exception as e:
-                logger.error(f"Erro ao prever metas dinâmicas: {e}. Usando metas de fallback.")
-                self.dynamic_profit_target = current_price * 1.001
-                self.dynamic_stop_loss = current_price * 0.998
-            
-            logger.info(f"🧠 Metas definidas -> Lucro: ${self.dynamic_profit_target:,.2f} | Stop: ${self.dynamic_stop_loss:,.2f}")
-            self._log_trade('BUY', decision_reason, current_price, btc_bought, usdt_to_spend)
-            self.save_state()
-
-        elif final_decision == 'SELL' and self.btc_balance > 0.00001:
-            btc_to_sell = self.btc_balance 
-            usdt_gained = btc_to_sell * current_price
-            profit = usdt_gained - (btc_to_sell * self.last_buy_price)
-            
-            self.btc_balance = 0.0
-            self.usdt_balance += usdt_gained
-            self.last_buy_price = 0.0
-            self.dynamic_profit_target = 0.0
-            self.dynamic_stop_loss = 0.0
-            
-            log_profit = f"Lucro: ${profit:,.4f}" if profit >= 0 else f"Prejuízo: ${-profit:,.4f}"
-            logger.info(f"📉 VENDA SIMULADA: {btc_to_sell:.8f} BTC por ${usdt_gained:,.4f}. {log_profit}")
-            self._log_trade('SELL', decision_reason, current_price, btc_to_sell, usdt_gained)
-            self.save_state()
-
-    def run_trading_cycle(self):
-        try:
-            current_price = self.client.get_current_price(self.symbol)
-            logger.info(f"💹 Preço atual BTC: ${current_price:,.2f}")
-            
-            historical_data = pd.read_csv('data/historical_data.csv')
-            features = self.ml_model.prepare_data_for_prediction(historical_data, current_price)
-            
-            self.execute_action(current_price, features)
-            
-            portfolio_value_usdt = self.usdt_balance + (self.btc_balance * current_price)
-            logger.info(f"Portfólio: ${portfolio_value_usdt:,.4f} | USDT: {self.usdt_balance:,.4f} | BTC: {self.btc_balance:.8f}")
-
         except Exception as e:
-            logger.error(f"Ocorreu um erro no ciclo de trading: {e}")
+            logger.error(f"Falha na inicialização do ML: {e}")
+            raise
+        logger.info("✅ Bot inicializado com sucesso!")
+        
+    def execute_action(self, current_price, signal_strength):
+        # --- LÓGICA DE INTUIÇÃO AMPLIFICADA ---
+        aggression_factor = 3.0 # Aumentamos a influência do ML
+        sell_pressure = 1 + (signal_strength.get('sell', 0) * aggression_factor)
+        buy_pressure = 1 + (signal_strength.get('buy', 0) * aggression_factor)
+        
+        adjusted_profit_target = self.base_profit_target / sell_pressure
+        adjusted_dip_target = self.base_dip_target / buy_pressure
+        logger.info(f"Intuição ML -> Compra: {buy_pressure:.2f}x, Venda: {sell_pressure:.2f}x | Metas -> Lucro: {adjusted_profit_target:.3%}, Queda: {adjusted_dip_target:.3%}")
 
-    def run(self, cycles=100, retrain_every=20):
+        # --- LÓGICA DE VENDA (Take Profit) ---
+        if self.btc_balance > 0.00001 and self.average_cost_price > 0:
+            if current_price > self.average_cost_price * (1 + adjusted_profit_target):
+                # Vende uma fração da posição
+                btc_to_sell = self.btc_balance * 0.5 # Vende 50% para realizar lucro mas manter exposição
+                if btc_to_sell * current_price < 10: btc_to_sell = self.btc_balance # Se for pouco, vende tudo
+                
+                usdt_gained = btc_to_sell * current_price
+                
+                self.btc_balance -= btc_to_sell
+                self.usdt_balance += usdt_gained
+                self.last_sell_price = current_price
+                
+                reason = f"Lucro de {(current_price / self.average_cost_price - 1):.2%}"
+                logger.info(f"🎯 VENDA LUCRATIVA: {btc_to_sell:.8f} BTC. Razão: {reason}")
+                self._log_trade('SELL', reason, current_price, btc_to_sell, usdt_gained)
+                self.save_state()
+                # Se ainda sobrou BTC, zera o preço médio para forçar uma reavaliação na próxima compra
+                if self.btc_balance < 0.00001: self.average_cost_price = 0
+                return
+
+        # --- LÓGICA DE COMPRA AGRESSIVA ---
+        buy_opportunity = False
+        reason = ""
+        # 1. Compra para reduzir o preço médio se o preço cair
+        if self.btc_balance > 0 and current_price < self.average_cost_price * (1 - adjusted_dip_target):
+             buy_opportunity = True
+             reason = "Redução de Custo Médio"
+        # 2. Recompra rápido após uma venda se o preço cair um pouco
+        elif self.last_sell_price > 0 and current_price < self.last_sell_price * (1 - self.rebuy_dip_target):
+             buy_opportunity = True
+             reason = "Recompra Estratégica"
+        # 3. Entrada inicial se não tivermos BTC
+        elif self.btc_balance < 0.00001:
+             buy_opportunity = True
+             reason = "Entrada Inicial no Mercado"
+
+        if buy_opportunity and self.usdt_balance > 10:
+            usdt_to_spend = self.usdt_balance * self.trade_ratio
+            btc_bought = usdt_to_spend / current_price
+            
+            total_cost_before = self.btc_balance * self.average_cost_price if self.btc_balance > 0 else 0
+            self.btc_balance += btc_bought
+            self.average_cost_price = (total_cost_before + usdt_to_spend) / self.btc_balance
+            self.usdt_balance -= usdt_to_spend
+            
+            logger.info(f"🎯 COMPRA ESTRATÉGICA: {btc_bought:.8f} BTC. Nova Média de Custo: ${self.average_cost_price:,.2f}")
+            self._log_trade('BUY', reason, current_price, btc_bought, usdt_to_spend)
+            self.save_state()
+        else:
+            if self.btc_balance > 0:
+                profit_loss_pct = (current_price / self.average_cost_price - 1) * 100
+                logger.info(f"Posição aberta. P/L atual: {profit_loss_pct:+.2f}%")
+
+    def run(self, cycles=500, retrain_every=50): # Retreinamento mais frequente
         self.initialize()
         for i in range(cycles):
             logger.info(f"--- 🔄 Ciclo {i + 1}/{cycles} ---")
-            self.run_trading_cycle()
-            
-            if (i + 1) % retrain_every == 0 and i > 0:
-                logger.info("🔔 HORA DE APRENDER! A retreinar os modelos dinâmicos...")
-                self.client.update_historical_data(self.symbol, '1h')
-                
-                try:
-                    logger.info("🧠 A retreinar modelos ML com a base de dados expandida...")
-                    historical_data = pd.read_csv('data/historical_data.csv')
-                    self.ml_model.train(historical_data)
-                except Exception as e:
-                    logger.error(f"Falha ao retreinar os modelos: {e}")
+            try:
+                current_price = self.client.get_current_price(SYMBOL)
+                logger.info(f"💹 Preço BTC: ${current_price:,.2f}")
 
-            if i < cycles - 1:
-                time.sleep(5) 
+                historical_data = pd.read_csv('data/historical_data.csv')
+                features = self.ml_model.prepare_data_for_prediction(historical_data, current_price)
+                _, signal_strength = self.ml_model.predict_signal(features)
+                
+                self.execute_action(current_price, signal_strength)
+                
+                portfolio_value = self.usdt_balance + (self.btc_balance * current_price)
+                logger.info(f"Portfólio: ${portfolio_value:,.2f} | USDT: {self.usdt_balance:,.2f} | BTC: {self.btc_balance:.8f} | Custo Médio: ${self.average_cost_price:,.2f}")
+
+                if (i + 1) % retrain_every == 0:
+                    self.client.update_historical_data(SYMBOL, '1h')
+                    self.ml_model.train(pd.read_csv('data/historical_data.csv'))
+
+            except Exception as e:
+                logger.error(f"Erro no ciclo de trading: {e}", exc_info=True)
+
+            if i < cycles - 1: time.sleep(5)
         logger.info("🏁 Execução finalizada!")

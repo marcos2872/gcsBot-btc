@@ -2,30 +2,23 @@
 import pandas as pd
 import joblib
 import os
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error
-from src.logger import logger
 import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+from src.logger import logger
 
 class MLTrader:
-    def __init__(self, profit_model_path='data/profit_model.pkl', stop_loss_model_path='data/stop_loss_model.pkl'):
-        self.profit_model_path = profit_model_path
-        self.stop_loss_model_path = stop_loss_model_path
-        self.profit_model = None
-        self.stop_loss_model = None
+    def __init__(self, model_path='data/adaptive_trader_model.pkl'):
+        self.model_path = model_path
+        self.model = None
         self._ensure_data_dir_exists()
 
     def _ensure_data_dir_exists(self):
-        os.makedirs(os.path.dirname(self.profit_model_path), exist_ok=True)
+        os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
 
-    # --- LÓGICA DE ALVOS CORRIGIDA ---
     def prepare_features(self, data):
-        """
-        Prepara features e calcula os alvos de forma mais robusta,
-        garantindo que estamos olhando para o futuro.
-        """
-        # As features continuam as mesmas
+        # Usando um conjunto rico de indicadores para dar o máximo de contexto ao modelo.
         data['sma_7'] = data['close'].rolling(window=7).mean()
         data['sma_25'] = data['close'].rolling(window=25).mean()
         delta = data['close'].diff()
@@ -42,53 +35,52 @@ class MLTrader:
         data['macd'] = exp1 - exp2
         data['macd_signal'] = data['macd'].ewm(span=9, adjust=False).mean()
         
-        # --- CÁLCULO DE ALVO CORRIGIDO ---
-        window = 5
-        # Alvo de Lucro: O preço MÁXIMO nos próximos 'window' períodos.
-        # .rolling().max() calcula o máximo da janela atual.
-        # .shift(-window) move esse valor para o presente, efetivamente olhando para o futuro.
-        data['future_max_price'] = data['close'].rolling(window).max().shift(-window)
-        # Alvo de Stop: O preço MÍNIMO nos próximos 'window' períodos.
-        data['future_min_price'] = data['close'].rolling(window).min().shift(-window)
-        
+        # Remove quaisquer linhas com NaN gerados pelos indicadores
         data.dropna(inplace=True)
+        
+        # --- LÓGICA DE ALVO (TARGET) MAIS INTELIGENTE ---
+        # O alvo é definido pela mudança percentual do preço nos próximos 5 períodos.
+        future_price_change_pct = (data['close'].shift(-5) - data['close']) / data['close']
+        
+        # Limiares para compra e venda
+        buy_threshold = 0.001  # Compra se o preço subir 0.1%
+        sell_threshold = -0.001 # Vende se o preço cair 0.1%
+        
+        # Cria as classes: 0 para HOLD, 1 para BUY, 2 para SELL
+        conditions = [
+            future_price_change_pct > buy_threshold,
+            future_price_change_pct < sell_threshold
+        ]
+        choices = [1, 2] # BUY, SELL
+        data['target'] = np.select(conditions, choices, default=0) # HOLD é o padrão
+        
+        # Remove as linhas onde o futuro é desconhecido
+        data.dropna(subset=['target'], inplace=True)
 
         features = ['sma_7', 'sma_25', 'rsi', 'bollinger_upper', 'bollinger_lower', 'macd', 'macd_signal']
-        targets = data[['future_max_price', 'future_min_price']]
-        return data[features], targets
+        return data[features], data['target']
 
-    # O resto do arquivo (train, predict, save, load) permanece o mesmo,
-    # pois a estrutura de dois modelos de regressão já está correta.
     def train(self, data):
-        features, targets = self.prepare_features(data)
+        features, target = self.prepare_features(data)
         if len(features) < 50:
-            logger.error("Não há dados suficientes para treinar os modelos de regressão.")
+            logger.error("Dados insuficientes para treinar o modelo adaptativo.")
             return
 
-        y_profit = targets['future_max_price']
-        y_stop_loss = targets['future_min_price']
-
-        X_train, X_test, y_train_profit, y_test_profit = train_test_split(features, y_profit, test_size=0.2, random_state=42)
-        self.profit_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-        self.profit_model.fit(X_train, y_train_profit)
-        profit_preds = self.profit_model.predict(X_test)
-        profit_rmse = np.sqrt(mean_squared_error(y_test_profit, profit_preds))
-        logger.info(f"Modelo de Lucro treinado. RMSE: {profit_rmse:.2f}")
-
-        X_train, X_test, y_train_stop, y_test_stop = train_test_split(features, y_stop_loss, test_size=0.2, random_state=42)
-        self.stop_loss_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-        self.stop_loss_model.fit(X_train, y_train_stop)
-        stop_preds = self.stop_loss_model.predict(X_test)
-        stop_rmse = np.sqrt(mean_squared_error(y_test_stop, stop_preds))
-        logger.info(f"Modelo de Stop-Loss treinado. RMSE: {stop_rmse:.2f}")
-
+        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42, stratify=target)
+        self.model = RandomForestClassifier(n_estimators=150, random_state=42, class_weight='balanced', n_jobs=-1, max_depth=10)
+        self.model.fit(X_train, y_train)
+        
+        y_pred = self.model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        logger.info(f"Modelo de Intuição Adaptativa treinado. Acurácia: {accuracy:.2f}")
         self.save_model()
 
     def prepare_data_for_prediction(self, historical_data, current_price):
         latest_data = historical_data.copy()
-        new_row = pd.DataFrame([{'close': current_price, 'open': 0, 'high': 0, 'low': 0, 'volume': 0}])
+        new_row = pd.DataFrame([{'close': current_price}])
         latest_data = pd.concat([latest_data, new_row], ignore_index=True)
         
+        # Calcula todas as features para a última linha (preço atual)
         latest_data['sma_7'] = latest_data['close'].rolling(window=7).mean()
         latest_data['sma_25'] = latest_data['close'].rolling(window=25).mean()
         delta = latest_data['close'].diff()
@@ -104,35 +96,31 @@ class MLTrader:
         exp2 = latest_data['close'].ewm(span=26, adjust=False).mean()
         latest_data['macd'] = exp1 - exp2
         latest_data['macd_signal'] = latest_data['macd'].ewm(span=9, adjust=False).mean()
-
-        return latest_data[['sma_7', 'sma_25', 'rsi', 'bollinger_upper', 'bollinger_lower', 'macd', 'macd_signal']].tail(1)
         
+        return latest_data[['sma_7', 'sma_25', 'rsi', 'bollinger_upper', 'bollinger_lower', 'macd', 'macd_signal']].tail(1)
+
+    def predict_signal(self, features):
+        if self.model is None: raise ValueError("Modelo não treinado.")
+        if features.isnull().values.any(): return 0, {'hold': 1, 'buy': 0, 'sell': 0}
+
+        probabilities = self.model.predict_proba(features)[0] 
+        classes = self.model.classes_
+
+        strength = {
+            'hold': probabilities[np.where(classes == 0)[0][0]] if 0 in classes else 0,
+            'buy': probabilities[np.where(classes == 1)[0][0]] if 1 in classes else 0,
+            'sell': probabilities[np.where(classes == 2)[0][0]] if 2 in classes else 0
+        }
+        
+        return classes[np.argmax(probabilities)], strength
+
     def save_model(self):
-        joblib.dump(self.profit_model, self.profit_model_path)
-        joblib.dump(self.stop_loss_model, self.stop_loss_model_path)
-        logger.info("✅ Modelos dinâmicos (Lucro e Stop) salvos com sucesso")
+        joblib.dump(self.model, self.model_path)
+        logger.info("✅ Modelo de Intuição Adaptativa salvo com sucesso.")
 
     def load_model(self):
-        if os.path.exists(self.profit_model_path) and os.path.exists(self.stop_loss_model_path):
-            self.profit_model = joblib.load(self.profit_model_path)
-            self.stop_loss_model = joblib.load(self.stop_loss_model_path)
-            logger.info("✅ Modelos dinâmicos carregados com sucesso")
+        if os.path.exists(self.model_path):
+            self.model = joblib.load(self.model_path)
+            logger.info("✅ Modelo de Intuição Adaptativa carregado com sucesso.")
             return True
-        logger.info("Nenhum modelo dinâmico salvo encontrado")
         return False
-
-    def predict(self, features):
-        if self.profit_model is None or self.stop_loss_model is None:
-            raise ValueError("Os modelos de regressão não foram treinados ou carregados.")
-        
-        if features.isnull().values.any():
-             logger.warning("Features com valores nulos para predição. Ignorando previsão.")
-             return None
-
-        profit_prediction = self.profit_model.predict(features)[0]
-        stop_loss_prediction = self.stop_loss_model.predict(features)[0]
-        
-        return {
-            'profit_target_price': profit_prediction,
-            'stop_loss_price': stop_loss_prediction
-        }
