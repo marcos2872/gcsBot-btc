@@ -2,11 +2,20 @@ import csv
 import os
 import time
 from binance.client import Client
-from .config import API_KEY, API_SECRET
+from .config import API_KEY, API_SECRET, TESTNET_API_KEY, TESTNET_API_SECRET, USE_TESTNET
+from binance.exceptions import BinanceAPIException
 
 class BinanceClient:
     def __init__(self):
-        self.client = Client(API_KEY, API_SECRET, {"timeout": 60})
+        # Usar Testnet ou Rede Real baseado na variável USE_TESTNET
+        if USE_TESTNET:
+            self.client = Client(TESTNET_API_KEY, TESTNET_API_SECRET, {"timeout": 60})
+            # Modificando a URL base para a Testnet
+            self.client.session.base_url = "https://testnet.binance.vision/api"
+            print("Conectando à Binance Testnet")
+        else:
+            self.client = Client(API_KEY, API_SECRET, {"timeout": 60})
+            print("Conectando à Binance Rede Real")
 
         try:
             # Acessando o cliente corretamente
@@ -15,17 +24,35 @@ class BinanceClient:
         except Exception as e:
             print(f"Erro ao conectar à API da Binance: {e}")
 
+    def get_local_timestamp(self):
+        """Retorna o timestamp local ajustado para 1 minuto atrás"""
+        current_timestamp = int(time.time() * 1000)  # Timestamp local em milissegundos
+        adjusted_timestamp = current_timestamp - 60 * 1000  # Ajusta para 1 minuto atrás
+        return adjusted_timestamp
+
+    def place_order(self, symbol, side, quantity):
+        """Faz uma ordem de compra/venda com timestamp ajustado"""
+        try:
+            # Usa o timestamp local ajustado para 1 minuto atrás
+            timestamp = self.get_local_timestamp()  # Ajuste o timestamp para 1 minuto atrás
+            
+            params = {
+                'symbol': symbol,
+                'side': side,
+                'quantity': quantity,
+                'timestamp': timestamp
+            }
+            if side == 'buy':
+                return self.client.order_market_buy(**params)
+            elif side == 'sell':
+                return self.client.order_market_sell(**params)
+        except BinanceAPIException as e:
+            print(f"Erro ao fazer o pedido: {e}")
+
     def get_current_price(self, symbol):
         """Retorna o preço atual do ativo"""
         ticker = self.client.get_symbol_ticker(symbol=symbol)
         return float(ticker['price'])
-
-    def place_order(self, symbol, side, quantity):
-        """Faz uma ordem de compra/venda"""
-        if side == 'buy':
-            return self.client.order_market_buy(symbol=symbol, quantity=quantity)
-        elif side == 'sell':
-            return self.client.order_market_sell(symbol=symbol, quantity=quantity)
 
     def get_balance(self, asset='USDT'):
         """Retorna o saldo disponível do ativo"""
