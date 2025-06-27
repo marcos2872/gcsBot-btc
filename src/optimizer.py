@@ -143,7 +143,7 @@ class WalkForwardOptimizer:
         strategy_params = {
             'profit_threshold': trial.suggest_float('profit_threshold', 0.005, 0.03),
             'stop_loss_threshold': trial.suggest_float('stop_loss_threshold', 0.005, 0.03),
-            'prediction_confidence': trial.suggest_float('prediction_confidence', 0.60, 0.90)
+            'prediction_confidence': trial.suggest_float('prediction_confidence', 0.52, 0.70)
         }
         
         model_params_copy = model_params.copy()

@@ -1,0 +1,203 @@
+2025-06-26 12:50:17,402 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-26 12:50:17,402 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-26 12:50:17,402 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-26 12:50:17,403 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-26 12:50:17,403 - gcsBot - INFO - ------------------------------------------
+2025-06-26 12:50:19,536 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ATIVADO ---
+2025-06-26 12:50:19,917 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-26 12:50:19,918 - gcsBot - INFO - Buscando 1 ano de dados históricos (1m)...
+2025-06-26 12:50:19,919 - gcsBot - INFO - Nenhum dado histórico local. Iniciando download completo do último ano...
+2025-06-26 12:50:19,925 - gcsBot - INFO - Iniciando download de 2024-06-26 até 2025-06-26...
+2025-06-26 12:50:45,644 - gcsBot - INFO - Baixando... 31923 registros coletados até 2025-06-26
+2025-06-26 12:50:47,133 - gcsBot - INFO - Download completo. Total de 31923 registros salvos.
+2025-06-26 12:50:47,133 - gcsBot - INFO - --- INICIANDO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-26 12:50:47,143 - gcsBot - ERROR - Dados insuficientes para realizar um único ciclo de Walk-Forward. São necessários 3 meses, mas apenas 1 foram encontrados.
+2025-06-26 12:50:47,144 - gcsBot - INFO - --- OTIMIZAÇÃO WALK-FORWARD CONCLUÍDA ---
+2025-06-26 13:21:32,683 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-26 13:21:32,683 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-26 13:21:32,684 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-26 13:21:32,684 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-26 13:21:32,684 - gcsBot - INFO - ------------------------------------------
+2025-06-26 13:21:33,667 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ATIVADO ---
+2025-06-26 13:21:34,030 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-26 13:21:34,031 - gcsBot - INFO - Buscando 1 ano de dados históricos (1m)...
+2025-06-26 13:21:34,032 - gcsBot - INFO - Arquivo de dados existente encontrado. Verificando e atualizando...
+2025-06-26 13:21:34,117 - gcsBot - WARNING - Arquivo local está incompleto. Baixando dados mais antigos para completar 1 ano...
+2025-06-26 13:21:34,117 - gcsBot - INFO - Iniciando download do lote de 2024-06-26 até 2024-07-26
+2025-06-26 13:21:34,117 - gcsBot - INFO - Iniciando download de 2024-06-26 até 2024-07-26...
+2025-06-26 13:22:00,806 - gcsBot - INFO - Baixando... 31955 registros coletados até 2025-06-26
+2025-06-26 13:22:01,454 - gcsBot - INFO - Lote baixado com sucesso: 31955 registros
+2025-06-26 13:22:01,454 - gcsBot - INFO - Iniciando download do lote de 2024-07-26 até 2024-08-25
+2025-06-26 13:22:01,455 - gcsBot - INFO - Iniciando download de 2024-07-26 até 2024-08-25...
+2025-06-26 13:22:21,807 - gcsBot - INFO - Baixando... 31955 registros coletados até 2025-06-26
+2025-06-26 13:22:22,471 - gcsBot - INFO - Lote baixado com sucesso: 31955 registros
+2025-06-26 13:22:22,471 - gcsBot - INFO - Iniciando download do lote de 2024-08-25 até 2024-09-24
+2025-06-26 13:22:22,471 - gcsBot - INFO - Iniciando download de 2024-08-25 até 2024-09-24...
+2025-06-26 13:22:42,914 - gcsBot - INFO - Baixando... 31955 registros coletados até 2025-06-26
+2025-06-26 13:22:43,560 - gcsBot - INFO - Lote baixado com sucesso: 31955 registros
+2025-06-26 13:22:43,560 - gcsBot - INFO - Iniciando download do lote de 2024-09-24 até 2024-10-24
+2025-06-26 13:22:43,560 - gcsBot - INFO - Iniciando download de 2024-09-24 até 2024-10-24...
+2025-06-26 13:23:03,952 - gcsBot - INFO - Baixando... 31956 registros coletados até 2025-06-26
+2025-06-26 13:23:04,598 - gcsBot - INFO - Lote baixado com sucesso: 31956 registros
+2025-06-26 13:23:04,598 - gcsBot - INFO - Iniciando download do lote de 2024-10-24 até 2024-11-23
+2025-06-26 13:23:04,598 - gcsBot - INFO - Iniciando download de 2024-10-24 até 2024-11-23...
+2025-06-26 13:23:25,125 - gcsBot - INFO - Baixando... 31956 registros coletados até 2025-06-26
+2025-06-26 13:23:25,771 - gcsBot - INFO - Lote baixado com sucesso: 31956 registros
+2025-06-26 13:23:25,771 - gcsBot - INFO - Iniciando download do lote de 2024-11-23 até 2024-12-23
+2025-06-26 13:23:25,772 - gcsBot - INFO - Iniciando download de 2024-11-23 até 2024-12-23...
+2025-06-26 13:23:47,156 - gcsBot - INFO - Baixando... 31956 registros coletados até 2025-06-26
+2025-06-26 13:23:47,821 - gcsBot - INFO - Lote baixado com sucesso: 31956 registros
+2025-06-26 13:23:47,821 - gcsBot - INFO - Iniciando download do lote de 2024-12-23 até 2025-01-22
+2025-06-26 13:23:47,822 - gcsBot - INFO - Iniciando download de 2024-12-23 até 2025-01-22...
+2025-06-26 13:24:08,538 - gcsBot - INFO - Baixando... 31957 registros coletados até 2025-06-26
+2025-06-26 13:24:09,239 - gcsBot - INFO - Lote baixado com sucesso: 31957 registros
+2025-06-26 13:24:09,239 - gcsBot - INFO - Iniciando download do lote de 2025-01-22 até 2025-02-21
+2025-06-26 13:24:09,240 - gcsBot - INFO - Iniciando download de 2025-01-22 até 2025-02-21...
+2025-06-26 13:24:29,833 - gcsBot - INFO - Baixando... 31957 registros coletados até 2025-06-26
+2025-06-26 13:24:30,510 - gcsBot - INFO - Lote baixado com sucesso: 31957 registros
+2025-06-26 13:24:30,511 - gcsBot - INFO - Iniciando download do lote de 2025-02-21 até 2025-03-23
+2025-06-26 13:24:30,511 - gcsBot - INFO - Iniciando download de 2025-02-21 até 2025-03-23...
+2025-06-26 13:24:51,775 - gcsBot - INFO - Baixando... 31957 registros coletados até 2025-06-26
+2025-06-26 13:24:52,458 - gcsBot - INFO - Lote baixado com sucesso: 31957 registros
+2025-06-26 13:24:52,459 - gcsBot - INFO - Iniciando download do lote de 2025-03-23 até 2025-04-22
+2025-06-26 13:24:52,459 - gcsBot - INFO - Iniciando download de 2025-03-23 até 2025-04-22...
+2025-06-26 13:25:12,759 - gcsBot - INFO - Baixando... 31958 registros coletados até 2025-06-26
+2025-06-26 13:25:13,437 - gcsBot - INFO - Lote baixado com sucesso: 31958 registros
+2025-06-26 13:25:13,438 - gcsBot - INFO - Iniciando download do lote de 2025-04-22 até 2025-05-22
+2025-06-26 13:25:13,438 - gcsBot - INFO - Iniciando download de 2025-04-22 até 2025-05-22...
+2025-06-26 13:25:33,647 - gcsBot - INFO - Baixando... 31958 registros coletados até 2025-06-26
+2025-06-26 13:25:34,336 - gcsBot - INFO - Lote baixado com sucesso: 31958 registros
+2025-06-26 13:25:34,336 - gcsBot - INFO - Iniciando download do lote de 2025-05-22 até 2025-06-04
+2025-06-26 13:25:34,336 - gcsBot - INFO - Iniciando download de 2025-05-22 até 2025-06-04...
+2025-06-26 13:25:54,921 - gcsBot - INFO - Baixando... 31958 registros coletados até 2025-06-26
+2025-06-26 13:25:55,597 - gcsBot - INFO - Lote baixado com sucesso: 31958 registros
+2025-06-26 13:25:55,625 - gcsBot - INFO - Iniciando download do lote de 2025-06-26 até 2025-06-26
+2025-06-26 13:25:55,625 - gcsBot - INFO - Iniciando download de 2025-06-26 até 2025-06-26...
+2025-06-26 13:25:56,192 - gcsBot - INFO - Baixando... 36 registros coletados até 2025-06-26
+2025-06-26 13:25:56,700 - gcsBot - INFO - Lote baixado com sucesso: 36 registros
+2025-06-26 13:25:57,138 - gcsBot - INFO - Dados atualizados. Total de 31958 registros.
+2025-06-26 13:25:57,149 - gcsBot - INFO - --- INICIANDO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-26 13:25:57,166 - gcsBot - ERROR - Dados insuficientes para realizar um único ciclo de Walk-Forward. São necessários 3 meses, mas apenas 1 foram encontrados.
+2025-06-26 13:25:57,167 - gcsBot - INFO - --- OTIMIZAÇÃO WALK-FORWARD CONCLUÍDA ---
+2025-06-26 13:42:45,716 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-26 13:42:45,716 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-26 13:42:45,717 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-26 13:42:45,717 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-26 13:42:45,717 - gcsBot - INFO - ------------------------------------------
+2025-06-26 13:42:46,768 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ATIVADO ---
+2025-06-26 13:42:47,143 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-26 13:42:47,143 - gcsBot - INFO - Buscando 1 ano de dados históricos (1m)...
+2025-06-26 13:42:47,144 - gcsBot - INFO - Arquivo de dados existente encontrado. Verificando e atualizando...
+2025-06-26 13:42:47,254 - gcsBot - WARNING - Arquivo local está incompleto. Baixando dados mais antigos para completar 1 ano...
+2025-06-26 13:42:47,254 - gcsBot - INFO - Iniciando download do lote de 2024-06-26 até 2024-07-26
+2025-06-26 13:42:47,254 - gcsBot - INFO - Iniciando download de 2024-06-26 até 2024-07-26...
+2025-06-26 13:43:13,718 - gcsBot - INFO - Baixando... 31976 registros coletados até 2025-06-26
+2025-06-26 13:43:14,367 - gcsBot - INFO - Lote baixado com sucesso: 31976 registros
+2025-06-26 13:43:14,368 - gcsBot - INFO - Iniciando download do lote de 2024-07-26 até 2024-08-25
+2025-06-26 13:43:14,368 - gcsBot - INFO - Iniciando download de 2024-07-26 até 2024-08-25...
+2025-06-26 13:43:34,644 - gcsBot - INFO - Baixando... 31976 registros coletados até 2025-06-26
+2025-06-26 13:43:35,385 - gcsBot - INFO - Lote baixado com sucesso: 31976 registros
+2025-06-26 13:43:35,386 - gcsBot - INFO - Iniciando download do lote de 2024-08-25 até 2024-09-24
+2025-06-26 13:43:35,386 - gcsBot - INFO - Iniciando download de 2024-08-25 até 2024-09-24...
+2025-06-26 13:43:56,876 - gcsBot - INFO - Baixando... 31976 registros coletados até 2025-06-26
+2025-06-26 13:43:57,521 - gcsBot - INFO - Lote baixado com sucesso: 31976 registros
+2025-06-26 13:43:57,522 - gcsBot - INFO - Iniciando download do lote de 2024-09-24 até 2024-10-24
+2025-06-26 13:43:57,522 - gcsBot - INFO - Iniciando download de 2024-09-24 até 2024-10-24...
+2025-06-26 13:44:17,759 - gcsBot - INFO - Baixando... 31977 registros coletados até 2025-06-26
+2025-06-26 13:44:18,417 - gcsBot - INFO - Lote baixado com sucesso: 31977 registros
+2025-06-26 13:44:18,418 - gcsBot - INFO - Iniciando download do lote de 2024-10-24 até 2024-11-23
+2025-06-26 13:44:18,418 - gcsBot - INFO - Iniciando download de 2024-10-24 até 2024-11-23...
+2025-06-26 13:44:38,627 - gcsBot - INFO - Baixando... 31977 registros coletados até 2025-06-26
+2025-06-26 13:44:39,272 - gcsBot - INFO - Lote baixado com sucesso: 31977 registros
+2025-06-26 13:44:39,272 - gcsBot - INFO - Iniciando download do lote de 2024-11-23 até 2024-12-23
+2025-06-26 13:44:39,272 - gcsBot - INFO - Iniciando download de 2024-11-23 até 2024-12-23...
+2025-06-26 13:45:01,502 - gcsBot - INFO - Baixando... 31978 registros coletados até 2025-06-26
+2025-06-26 13:45:02,150 - gcsBot - INFO - Lote baixado com sucesso: 31978 registros
+2025-06-26 13:45:02,150 - gcsBot - INFO - Iniciando download do lote de 2024-12-23 até 2025-01-22
+2025-06-26 13:45:02,150 - gcsBot - INFO - Iniciando download de 2024-12-23 até 2025-01-22...
+2025-06-26 13:45:22,459 - gcsBot - INFO - Baixando... 31978 registros coletados até 2025-06-26
+2025-06-26 13:45:23,194 - gcsBot - INFO - Lote baixado com sucesso: 31978 registros
+2025-06-26 13:45:23,194 - gcsBot - INFO - Iniciando download do lote de 2025-01-22 até 2025-02-21
+2025-06-26 13:45:23,194 - gcsBot - INFO - Iniciando download de 2025-01-22 até 2025-02-21...
+2025-06-26 13:45:43,436 - gcsBot - INFO - Baixando... 31978 registros coletados até 2025-06-26
+2025-06-26 13:45:44,117 - gcsBot - INFO - Lote baixado com sucesso: 31978 registros
+2025-06-26 13:45:44,117 - gcsBot - INFO - Iniciando download do lote de 2025-02-21 até 2025-03-23
+2025-06-26 13:45:44,117 - gcsBot - INFO - Iniciando download de 2025-02-21 até 2025-03-23...
+2025-06-26 13:46:04,319 - gcsBot - INFO - Baixando... 31979 registros coletados até 2025-06-26
+2025-06-26 13:46:04,992 - gcsBot - INFO - Lote baixado com sucesso: 31979 registros
+2025-06-26 13:46:04,992 - gcsBot - INFO - Iniciando download do lote de 2025-03-23 até 2025-04-22
+2025-06-26 13:46:04,992 - gcsBot - INFO - Iniciando download de 2025-03-23 até 2025-04-22...
+2025-06-26 13:46:25,237 - gcsBot - INFO - Baixando... 31979 registros coletados até 2025-06-26
+2025-06-26 13:46:25,918 - gcsBot - INFO - Lote baixado com sucesso: 31979 registros
+2025-06-26 13:46:25,918 - gcsBot - INFO - Iniciando download do lote de 2025-04-22 até 2025-05-22
+2025-06-26 13:46:25,918 - gcsBot - INFO - Iniciando download de 2025-04-22 até 2025-05-22...
+2025-06-26 13:46:46,431 - gcsBot - INFO - Baixando... 31979 registros coletados até 2025-06-26
+2025-06-26 13:46:47,102 - gcsBot - INFO - Lote baixado com sucesso: 31979 registros
+2025-06-26 13:46:47,103 - gcsBot - INFO - Iniciando download do lote de 2025-05-22 até 2025-06-04
+2025-06-26 13:46:47,103 - gcsBot - INFO - Iniciando download de 2025-05-22 até 2025-06-04...
+2025-06-26 13:47:07,476 - gcsBot - INFO - Baixando... 31980 registros coletados até 2025-06-26
+2025-06-26 13:47:08,163 - gcsBot - INFO - Lote baixado com sucesso: 31980 registros
+2025-06-26 13:47:08,188 - gcsBot - INFO - Iniciando download do lote de 2025-06-26 até 2025-06-26
+2025-06-26 13:47:08,188 - gcsBot - INFO - Iniciando download de 2025-06-26 até 2025-06-26...
+2025-06-26 13:47:08,750 - gcsBot - INFO - Baixando... 23 registros coletados até 2025-06-26
+2025-06-26 13:47:09,257 - gcsBot - INFO - Lote baixado com sucesso: 23 registros
+2025-06-26 13:47:09,615 - gcsBot - INFO - Dados atualizados. Total de 31980 registros.
+2025-06-26 13:47:09,627 - gcsBot - INFO - --- INICIANDO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-26 13:47:09,640 - gcsBot - ERROR - Dados insuficientes para realizar um único ciclo de Walk-Forward. São necessários 3 meses, mas apenas 1 foram encontrados.
+2025-06-26 13:47:09,640 - gcsBot - INFO - --- OTIMIZAÇÃO WALK-FORWARD CONCLUÍDA ---
+2025-06-26 14:10:05,764 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-26 14:10:05,765 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-26 14:10:05,765 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-26 14:10:05,765 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-26 14:10:05,765 - gcsBot - INFO - ------------------------------------------
+2025-06-26 14:10:42,575 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-26 14:10:42,576 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-26 14:10:42,576 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-26 14:10:42,576 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-26 14:10:42,576 - gcsBot - INFO - ------------------------------------------
+2025-06-26 14:10:45,560 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-26 14:10:45,941 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-26 14:10:45,942 - gcsBot - INFO - CSV local encontrado, carregando e atualizando…
+2025-06-26 14:10:45,969 - gcsBot - INFO - Baixando lote: 2025-06-26 → 2025-06-26
+2025-06-26 15:22:52,283 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-26 15:22:52,283 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-26 15:22:52,283 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-26 15:22:52,284 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-26 15:22:52,284 - gcsBot - INFO - ------------------------------------------
+2025-06-26 15:22:56,020 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-26 15:22:56,398 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-26 15:22:56,398 - gcsBot - INFO - CSV local encontrado, carregando e atualizando…
+2025-06-26 15:22:56,443 - gcsBot - INFO - Baixando lote: 2025-06-26 → 2025-06-26
+2025-06-26 15:22:58,678 - gcsBot - INFO - Atualizado com 1103 velas novas.
+2025-06-26 15:22:58,680 - gcsBot - INFO - --- INICIANDO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-26 15:22:58,687 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #1 ---
+2025-06-26 15:22:58,688 - gcsBot - INFO - Período de Treino: 2024-06 a 2024-06
+2025-06-26 15:22:58,688 - gcsBot - INFO - Período de Teste:  2024-07 a 2024-07
+2025-06-26 15:22:58,705 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,706 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,709 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,712 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,713 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,716 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,718 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,721 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,723 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,725 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,727 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,730 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,734 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,735 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,737 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,740 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,743 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,745 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,935 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:58,947 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:59,000 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:59,033 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:59,071 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:59,092 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:59,097 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).
+2025-06-26 15:22:59,099 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 153, 'max_depth': 10, 'min_samples_leaf': 9, 'profit_threshold': 0.012997014779419901, 'stop_loss_threshold': 0.005028090687693809, 'prediction_confidence': 0.7620344810442038}
+2025-06-26 15:22:59,099 - gcsBot - WARNING - Dados insuficientes para um treino robusto (4 registros).

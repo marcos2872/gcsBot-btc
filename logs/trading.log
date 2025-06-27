@@ -1,0 +1,480 @@
+2025-06-27 12:57:54,065 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-27 12:57:54,066 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-27 12:57:54,066 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-27 12:57:54,066 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-27 12:57:54,066 - gcsBot - INFO - WFO Janela de Treino: 43200 minutos (~30.0 dias)
+2025-06-27 12:57:54,066 - gcsBot - INFO - WFO Janela de Teste:  10080 minutos (~7.0 dias)
+2025-06-27 12:57:54,066 - gcsBot - INFO - WFO Passo da Janela:  10080 minutos (~7.0 dias)
+2025-06-27 12:57:54,067 - gcsBot - INFO - ------------------------------------------
+2025-06-27 12:58:07,691 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-27 12:58:08,323 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-27 12:58:08,324 - gcsBot - WARNING - Nenhum arquivo local encontrado (nem mestre, nem Kaggle). Baixando o último ano da Binance como fallback.
+2025-06-27 12:58:08,325 - gcsBot - INFO - Baixando lote da Binance: 2024-06-27 → 2024-07-27
+2025-06-27 12:58:08,666 - gcsBot - ERROR - Sem dados para otimizar. Abortando.
+2025-06-27 13:01:54,917 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-27 13:01:54,918 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-27 13:01:54,918 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-27 13:01:54,918 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-27 13:01:54,918 - gcsBot - INFO - WFO Janela de Treino: 43200 minutos (~30.0 dias)
+2025-06-27 13:01:54,918 - gcsBot - INFO - WFO Janela de Teste:  10080 minutos (~7.0 dias)
+2025-06-27 13:01:54,919 - gcsBot - INFO - WFO Passo da Janela:  10080 minutos (~7.0 dias)
+2025-06-27 13:01:54,919 - gcsBot - INFO - ------------------------------------------
+2025-06-27 13:01:57,054 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-27 13:01:57,398 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-27 13:01:57,398 - gcsBot - INFO - Arquivo mestre não encontrado. Iniciando a partir do arquivo Kaggle: 'data\kaggle_btc_1m_bootstrap.csv'
+2025-06-27 13:02:01,859 - gcsBot - INFO - Pré-processando dados do Kaggle...
+2025-06-27 13:04:30,620 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-27 13:04:30,621 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-27 13:04:30,621 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-27 13:04:30,621 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-27 13:04:30,621 - gcsBot - INFO - WFO Janela de Treino: 43200 minutos (~30.0 dias)
+2025-06-27 13:04:30,621 - gcsBot - INFO - WFO Janela de Teste:  10080 minutos (~7.0 dias)
+2025-06-27 13:04:30,621 - gcsBot - INFO - WFO Passo da Janela:  10080 minutos (~7.0 dias)
+2025-06-27 13:04:30,622 - gcsBot - INFO - ------------------------------------------
+2025-06-27 13:04:32,763 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-27 13:04:33,105 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-27 13:04:33,105 - gcsBot - INFO - Arquivo mestre não encontrado. Iniciando a partir do arquivo Kaggle: 'data\kaggle_btc_1m_bootstrap.csv'
+2025-06-27 13:04:37,584 - gcsBot - INFO - Pré-processando dados do Kaggle...
+2025-06-27 13:04:40,794 - gcsBot - INFO - Processamento concluído. 7091728 registros válidos carregados do Kaggle.
+2025-06-27 13:04:40,819 - gcsBot - INFO - Atualizando dados do Kaggle com os dados mais recentes da Binance...
+2025-06-27 13:04:40,821 - gcsBot - INFO - Baixando lote da Binance: 2025-06-27 → 2025-06-27
+2025-06-27 13:04:44,640 - gcsBot - INFO - Salvando o novo arquivo de dados mestre combinado em 'data\full_historical_BTCUSDT_1m.csv'.
+2025-06-27 13:05:42,585 - gcsBot - INFO - --- INICIANDO OTIMIZAÇÃO WALK-FORWARD POR MINUTOS ---
+2025-06-27 13:05:42,585 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #1 ---
+2025-06-27 13:05:42,585 - gcsBot - INFO - Treino: 2012-01-01 a 2012-01-31 (Índices 0:43200)
+2025-06-27 13:05:42,586 - gcsBot - INFO - Teste:  2012-01-31 a 2012-02-07 (Índices 43200:53280)
+2025-06-27 13:06:27,349 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 167, 'max_depth': 14, 'min_samples_leaf': 11, 'future_periods': 34, 'profit_mult': 1.2033457197127952, 'stop_mult': 1.366489645773616, 'profit_threshold': 0.014633525233859575, 'stop_loss_threshold': 0.027654410064853176, 'prediction_confidence': 0.8690568070833539}
+2025-06-27 13:06:28,902 - gcsBot - INFO - Resultado do Período: Capital Final: $237.45, Trades: 43, Sharpe (Anualizado): 38.10
+2025-06-27 13:06:28,902 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #2 ---
+2025-06-27 13:06:28,902 - gcsBot - INFO - Treino: 2012-01-08 a 2012-02-07 (Índices 10080:53280)
+2025-06-27 13:06:28,903 - gcsBot - INFO - Teste:  2012-02-07 a 2012-02-14 (Índices 53280:63360)
+2025-06-27 13:07:19,536 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 183, 'max_depth': 24, 'min_samples_leaf': 14, 'future_periods': 43, 'profit_mult': 2.88637086042735, 'stop_mult': 1.7183978634485262, 'profit_threshold': 0.0206806435327076, 'stop_loss_threshold': 0.005735062075193434, 'prediction_confidence': 0.6022637611643856}
+2025-06-27 13:07:21,194 - gcsBot - INFO - Resultado do Período: Capital Final: $96.14, Trades: 35, Sharpe (Anualizado): -3.58
+2025-06-27 13:07:21,194 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #3 ---
+2025-06-27 13:07:21,195 - gcsBot - INFO - Treino: 2012-01-15 a 2012-02-14 (Índices 20160:63360)
+2025-06-27 13:07:21,195 - gcsBot - INFO - Teste:  2012-02-14 a 2012-02-21 (Índices 63360:73440)
+2025-06-27 13:08:08,376 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 208, 'max_depth': 22, 'min_samples_leaf': 8, 'future_periods': 60, 'profit_mult': 1.6828889115470935, 'stop_mult': 1.2310852353657196, 'profit_threshold': 0.01767677908895245, 'stop_loss_threshold': 0.012377815530282874, 'prediction_confidence': 0.8813775645337945}
+2025-06-27 13:08:10,169 - gcsBot - INFO - Resultado do Período: Capital Final: $106.51, Trades: 75, Sharpe (Anualizado): 7.65
+2025-06-27 13:08:10,169 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #4 ---
+2025-06-27 13:08:10,170 - gcsBot - INFO - Treino: 2012-01-22 a 2012-02-21 (Índices 30240:73440)
+2025-06-27 13:08:10,170 - gcsBot - INFO - Teste:  2012-02-21 a 2012-02-28 (Índices 73440:83520)
+2025-06-27 13:09:08,896 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 230, 'max_depth': 12, 'min_samples_leaf': 18, 'future_periods': 11, 'profit_mult': 2.050073953236873, 'stop_mult': 2.329029454658283, 'profit_threshold': 0.017704872662159386, 'stop_loss_threshold': 0.009895237667410696, 'prediction_confidence': 0.7000072640920558}
+2025-06-27 13:09:10,909 - gcsBot - INFO - Resultado do Período: Capital Final: $109.33, Trades: 32, Sharpe (Anualizado): 21.24
+2025-06-27 13:09:10,909 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #5 ---
+2025-06-27 13:09:10,910 - gcsBot - INFO - Treino: 2012-01-29 a 2012-02-28 (Índices 40320:83520)
+2025-06-27 13:09:10,910 - gcsBot - INFO - Teste:  2012-02-28 a 2012-03-06 (Índices 83520:93600)
+2025-06-27 13:10:14,081 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 93, 'max_depth': 12, 'min_samples_leaf': 9, 'future_periods': 34, 'profit_mult': 1.5020816225802132, 'stop_mult': 1.9520584065564908, 'profit_threshold': 0.01420675074811403, 'stop_loss_threshold': 0.02847498314989022, 'prediction_confidence': 0.7499684595814871}
+2025-06-27 13:10:16,274 - gcsBot - INFO - Resultado do Período: Capital Final: $91.20, Trades: 40, Sharpe (Anualizado): -16.59
+2025-06-27 13:10:16,275 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #6 ---
+2025-06-27 13:10:16,275 - gcsBot - INFO - Treino: 2012-02-05 a 2012-03-06 (Índices 50400:93600)
+2025-06-27 13:10:16,275 - gcsBot - INFO - Teste:  2012-03-06 a 2012-03-13 (Índices 93600:103680)
+2025-06-27 13:11:21,479 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 107, 'max_depth': 18, 'min_samples_leaf': 9, 'future_periods': 48, 'profit_mult': 1.1843411873696488, 'stop_mult': 2.536437406861471, 'profit_threshold': 0.015415099985054435, 'stop_loss_threshold': 0.006358713692416319, 'prediction_confidence': 0.6979621778798709}
+2025-06-27 13:11:23,699 - gcsBot - INFO - Resultado do Período: Capital Final: $100.18, Trades: 38, Sharpe (Anualizado): 1.57
+2025-06-27 13:11:23,699 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #7 ---
+2025-06-27 13:11:23,700 - gcsBot - INFO - Treino: 2012-02-12 a 2012-03-13 (Índices 60480:103680)
+2025-06-27 13:11:23,700 - gcsBot - INFO - Teste:  2012-03-13 a 2012-03-20 (Índices 103680:113760)
+2025-06-27 13:12:34,257 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 90, 'max_depth': 12, 'min_samples_leaf': 14, 'future_periods': 11, 'profit_mult': 2.466473992429906, 'stop_mult': 2.124512715300648, 'profit_threshold': 0.02991893624050135, 'stop_loss_threshold': 0.006155330997621232, 'prediction_confidence': 0.6074675285945845}
+2025-06-27 13:12:36,760 - gcsBot - INFO - Resultado do Período: Capital Final: $107.06, Trades: 63, Sharpe (Anualizado): 20.42
+2025-06-27 13:12:36,761 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #8 ---
+2025-06-27 13:12:36,761 - gcsBot - INFO - Treino: 2012-02-19 a 2012-03-20 (Índices 70560:113760)
+2025-06-27 13:12:36,761 - gcsBot - INFO - Teste:  2012-03-20 a 2012-03-27 (Índices 113760:123840)
+2025-06-27 13:13:53,416 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 219, 'max_depth': 19, 'min_samples_leaf': 5, 'future_periods': 13, 'profit_mult': 1.9162757248281912, 'stop_mult': 1.7835768157831056, 'profit_threshold': 0.01352864750020831, 'stop_loss_threshold': 0.02830362214329238, 'prediction_confidence': 0.8139554481562207}
+2025-06-27 13:13:56,119 - gcsBot - INFO - Resultado do Período: Capital Final: $114.15, Trades: 20, Sharpe (Anualizado): 30.86
+2025-06-27 13:13:56,120 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #9 ---
+2025-06-27 13:13:56,120 - gcsBot - INFO - Treino: 2012-02-26 a 2012-03-27 (Índices 80640:123840)
+2025-06-27 13:13:56,120 - gcsBot - INFO - Teste:  2012-03-27 a 2012-04-03 (Índices 123840:133920)
+2025-06-27 13:15:02,703 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 192, 'max_depth': 8, 'min_samples_leaf': 13, 'future_periods': 60, 'profit_mult': 2.905469568761798, 'stop_mult': 1.0025745817947869, 'profit_threshold': 0.011305554430399514, 'stop_loss_threshold': 0.021432293331564028, 'prediction_confidence': 0.6057379257383995}
+2025-06-27 13:15:05,015 - gcsBot - INFO - Resultado do Período: Capital Final: $98.48, Trades: 79, Sharpe (Anualizado): -1.46
+2025-06-27 13:15:05,016 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #10 ---
+2025-06-27 13:15:05,016 - gcsBot - INFO - Treino: 2012-03-04 a 2012-04-03 (Índices 90720:133920)
+2025-06-27 13:15:05,016 - gcsBot - INFO - Teste:  2012-04-03 a 2012-04-10 (Índices 133920:144000)
+2025-06-27 13:16:14,581 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 208, 'max_depth': 12, 'min_samples_leaf': 10, 'future_periods': 60, 'profit_mult': 1.0039968357477236, 'stop_mult': 2.1396744351982013, 'profit_threshold': 0.006851429837474457, 'stop_loss_threshold': 0.02945584027965039, 'prediction_confidence': 0.7387505961464373}
+2025-06-27 13:16:16,991 - gcsBot - INFO - Resultado do Período: Capital Final: $98.88, Trades: 49, Sharpe (Anualizado): -2.30
+2025-06-27 13:16:16,992 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #11 ---
+2025-06-27 13:16:16,992 - gcsBot - INFO - Treino: 2012-03-11 a 2012-04-10 (Índices 100800:144000)
+2025-06-27 13:16:16,992 - gcsBot - INFO - Teste:  2012-04-10 a 2012-04-17 (Índices 144000:154080)
+2025-06-27 13:17:25,144 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 107, 'max_depth': 17, 'min_samples_leaf': 6, 'future_periods': 44, 'profit_mult': 1.393724920555994, 'stop_mult': 2.8757024102980706, 'profit_threshold': 0.008822913185267931, 'stop_loss_threshold': 0.015161784507306802, 'prediction_confidence': 0.6363643409120882}
+2025-06-27 13:17:27,547 - gcsBot - INFO - Resultado do Período: Capital Final: $101.43, Trades: 70, Sharpe (Anualizado): 6.18
+2025-06-27 13:17:27,547 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #12 ---
+2025-06-27 13:17:27,547 - gcsBot - INFO - Treino: 2012-03-18 a 2012-04-17 (Índices 110880:154080)
+2025-06-27 13:17:27,547 - gcsBot - INFO - Teste:  2012-04-17 a 2012-04-24 (Índices 154080:164160)
+2025-06-27 13:18:43,762 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 223, 'max_depth': 15, 'min_samples_leaf': 6, 'future_periods': 20, 'profit_mult': 1.4543648571646153, 'stop_mult': 1.6273813428009447, 'profit_threshold': 0.029819179447917808, 'stop_loss_threshold': 0.011953484198045145, 'prediction_confidence': 0.6046262059426702}
+2025-06-27 13:18:46,332 - gcsBot - INFO - Resultado do Período: Capital Final: $95.60, Trades: 37, Sharpe (Anualizado): -21.42
+2025-06-27 13:18:46,333 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #13 ---
+2025-06-27 13:18:46,333 - gcsBot - INFO - Treino: 2012-03-25 a 2012-04-24 (Índices 120960:164160)
+2025-06-27 13:18:46,333 - gcsBot - INFO - Teste:  2012-04-24 a 2012-05-01 (Índices 164160:174240)
+2025-06-27 13:20:14,142 - gcsBot - INFO - Melhores parâmetros para este ciclo: {'n_estimators': 238, 'max_depth': 20, 'min_samples_leaf': 8, 'future_periods': 11, 'profit_mult': 1.2714236515723694, 'stop_mult': 2.332285184067044, 'profit_threshold': 0.02865525799235491, 'stop_loss_threshold': 0.01211887859126824, 'prediction_confidence': 0.6308116517707322}
+2025-06-27 13:20:17,038 - gcsBot - INFO - Resultado do Período: Capital Final: $85.14, Trades: 87, Sharpe (Anualizado): -47.83
+2025-06-27 13:20:17,039 - gcsBot - INFO - 
+--- Ciclo de Walk-Forward #14 ---
+2025-06-27 13:20:17,039 - gcsBot - INFO - Treino: 2012-04-01 a 2012-05-01 (Índices 131040:174240)
+2025-06-27 13:20:17,039 - gcsBot - INFO - Teste:  2012-05-01 a 2012-05-08 (Índices 174240:184320)
+2025-06-27 13:22:01,339 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-27 13:22:01,339 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-27 13:22:01,339 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-27 13:22:01,340 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-27 13:22:01,340 - gcsBot - INFO - WFO Janela de Treino: 43200 minutos (~30.0 dias)
+2025-06-27 13:22:01,340 - gcsBot - INFO - WFO Janela de Teste:  10080 minutos (~7.0 dias)
+2025-06-27 13:22:01,340 - gcsBot - INFO - WFO Passo da Janela:  10080 minutos (~7.0 dias)
+2025-06-27 13:22:01,340 - gcsBot - INFO - ------------------------------------------
+2025-06-27 13:22:03,508 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-27 13:22:03,908 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-27 13:22:03,909 - gcsBot - INFO - Arquivo de dados local encontrado em 'data\full_historical_BTCUSDT_1m.csv'. Carregando e atualizando...
+2025-06-27 13:22:38,245 - gcsBot - INFO - Buscando novos dados da Binance para atualizar o arquivo local...
+2025-06-27 13:22:38,245 - gcsBot - INFO - Baixando lote da Binance: 2025-06-27 → 2025-06-27
+2025-06-27 13:23:36,506 - gcsBot - INFO - Arquivo atualizado com 19 novas velas.
+2025-06-27 13:23:36,637 - gcsBot - INFO - ================================================================================
+2025-06-27 13:23:36,637 - gcsBot - INFO - --- INICIANDO PROCESSO DE OTIMIZAÇÃO WALK-FORWARD (WFO) ---
+2025-06-27 13:23:36,637 - gcsBot - INFO - ================================================================================
+2025-06-27 13:23:36,647 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 13:23:36,647 - gcsBot - INFO - INICIANDO CICLO DE WFO #1
+2025-06-27 13:23:36,647 - gcsBot - INFO -   - Período de Treino: 2018-01-01 a 2018-01-30
+2025-06-27 13:23:36,647 - gcsBot - INFO -   - Período de Teste:  2018-01-31 a 2018-02-06
+2025-06-27 13:23:36,648 - gcsBot - INFO -   - Otimizando parâmetros com Optuna (25 trials)...
+2025-06-27 13:33:15,866 - gcsBot - INFO -   - Otimização do ciclo #1 concluída.
+2025-06-27 13:33:15,867 - gcsBot - INFO -   - Melhor Resultado (Sharpe no Treino): 9.8013
+2025-06-27 13:33:15,867 - gcsBot - INFO -   - Melhores Parâmetros Encontrados:
+2025-06-27 13:33:15,867 - gcsBot - INFO -     - n_estimators: 163
+2025-06-27 13:33:15,867 - gcsBot - INFO -     - max_depth: 21
+2025-06-27 13:33:15,868 - gcsBot - INFO -     - min_samples_leaf: 20
+2025-06-27 13:33:15,868 - gcsBot - INFO -     - future_periods: 11
+2025-06-27 13:33:15,868 - gcsBot - INFO -     - profit_mult: 1.776895
+2025-06-27 13:33:15,868 - gcsBot - INFO -     - stop_mult: 1.004269
+2025-06-27 13:33:15,868 - gcsBot - INFO -     - profit_threshold: 0.016446
+2025-06-27 13:33:15,868 - gcsBot - INFO -     - stop_loss_threshold: 0.015403
+2025-06-27 13:33:15,869 - gcsBot - INFO -     - prediction_confidence: 0.747303
+2025-06-27 13:33:15,869 - gcsBot - INFO -   - Treinando modelo final do ciclo com os melhores parâmetros...
+2025-06-27 13:33:39,453 - gcsBot - INFO -   - Executando backtest no período de teste (fora da amostra)...
+2025-06-27 13:33:39,670 - gcsBot - INFO - ------------------------- RESULTADO DO CICLO 1 --------------------------
+2025-06-27 13:33:39,670 - gcsBot - INFO -   - Capital Final: $104.75 (Retorno de 4.75%)
+2025-06-27 13:33:39,670 - gcsBot - INFO -   - Trades Executados: 10
+2025-06-27 13:33:39,671 - gcsBot - INFO -   - Sharpe Ratio (Anualizado): 9.80
+2025-06-27 13:33:39,671 - gcsBot - INFO - --------------------------------------------------------------------------------
+2025-06-27 13:33:39,672 - gcsBot - INFO - Estado da WFO salvo. Ciclo #1 completo.
+2025-06-27 13:33:39,673 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 13:33:39,673 - gcsBot - INFO - INICIANDO CICLO DE WFO #2
+2025-06-27 13:33:39,673 - gcsBot - INFO -   - Período de Treino: 2018-01-08 a 2018-02-06
+2025-06-27 13:33:39,674 - gcsBot - INFO -   - Período de Teste:  2018-02-07 a 2018-02-13
+2025-06-27 13:33:39,674 - gcsBot - INFO -   - Otimizando parâmetros com Optuna (25 trials)...
+2025-06-27 13:38:08,703 - gcsBot - WARNING - 
+==================================================
+2025-06-27 13:38:08,720 - gcsBot - WARNING - PARADA SOLICITADA! Finalizando o trial atual...
+2025-06-27 13:38:08,770 - gcsBot - WARNING - O processo será encerrado de forma limpa antes do próximo ciclo de WFO.
+2025-06-27 13:38:08,775 - gcsBot - WARNING - O progresso até o último ciclo completo foi salvo.
+2025-06-27 13:38:08,784 - gcsBot - WARNING - ==================================================
+2025-06-27 13:38:33,073 - gcsBot - INFO - 
+
+================================================================================
+2025-06-27 13:38:33,073 - gcsBot - INFO - --- OTIMIZAÇÃO WALK-FORWARD CONCLUÍDA ---
+2025-06-27 13:38:33,073 - gcsBot - INFO - ================================================================================
+2025-06-27 13:38:33,074 - gcsBot - INFO - --- RESULTADO CONSOLIDADO POR PERÍODO ---
+2025-06-27 13:38:33,074 - gcsBot - INFO -   - Período: 2018-01-31_a_2018-02-06 | Trades:  10 | Resultado: +4.75% | Sharpe: 9.80
+2025-06-27 13:38:33,074 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 13:38:33,074 - gcsBot - INFO - --- RESUMO ESTATÍSTICO GERAL ---
+2025-06-27 13:38:33,074 - gcsBot - INFO -   - Total de Ciclos de WFO Completos: 1
+2025-06-27 13:38:33,074 - gcsBot - INFO -   - Capital Final Acumulado (Simulado): $104.75
+2025-06-27 13:38:33,075 - gcsBot - INFO -   - Lucro Total no Período Simulado: +4.75%
+2025-06-27 13:38:33,075 - gcsBot - INFO -   - Total de Trades em todos os ciclos: 10
+2025-06-27 13:38:33,075 - gcsBot - INFO -   - Média do Sharpe Ratio nos períodos de teste: 9.80
+2025-06-27 13:38:33,076 - gcsBot - INFO -   - Mediana do Sharpe Ratio nos períodos de teste: 9.80
+2025-06-27 13:38:33,076 - gcsBot - INFO -   - Taxa de Sucesso (Ciclos com Lucro): 100.00%
+2025-06-27 13:38:33,076 - gcsBot - INFO - --------------------------------------------------------------------------------
+2025-06-27 13:38:33,076 - gcsBot - INFO - Salvando o modelo e o normalizador do último ciclo bem-sucedido...
+2025-06-27 13:38:33,158 - gcsBot - INFO - ✅ Modelo final e robusto salvo em 'data\trading_model.pkl'
+2025-06-27 14:40:07,614 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-27 14:40:07,614 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-27 14:40:07,615 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-27 14:40:07,615 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-27 14:40:07,615 - gcsBot - INFO - WFO Janela de Treino: 43200 minutos (~30.0 dias)
+2025-06-27 14:40:07,615 - gcsBot - INFO - WFO Janela de Teste:  10080 minutos (~7.0 dias)
+2025-06-27 14:40:07,615 - gcsBot - INFO - WFO Passo da Janela:  10080 minutos (~7.0 dias)
+2025-06-27 14:40:07,615 - gcsBot - INFO - ------------------------------------------
+2025-06-27 14:40:11,260 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-27 14:40:11,801 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-27 14:40:11,801 - gcsBot - INFO - Arquivo de dados local encontrado em 'data\full_historical_BTCUSDT_1m.csv'. Carregando e atualizando...
+2025-06-27 14:40:49,266 - gcsBot - INFO - Buscando novos dados da Binance para atualizar o arquivo local...
+2025-06-27 14:40:49,267 - gcsBot - INFO - Baixando lote da Binance: 2025-06-27 → 2025-06-27
+2025-06-27 14:41:51,817 - gcsBot - INFO - Arquivo atualizado com 79 novas velas.
+2025-06-27 14:41:51,962 - gcsBot - INFO - ================================================================================
+2025-06-27 14:41:51,962 - gcsBot - INFO - --- INICIANDO PROCESSO DE OTIMIZAÇÃO WALK-FORWARD (WFO) ---
+2025-06-27 14:41:51,962 - gcsBot - INFO - ================================================================================
+2025-06-27 14:41:51,972 - gcsBot - INFO - ==================================================
+2025-06-27 14:41:51,972 - gcsBot - INFO - Estado de otimização anterior encontrado! Retomando do ciclo #2.
+2025-06-27 14:41:51,973 - gcsBot - INFO - ==================================================
+2025-06-27 14:41:51,973 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 14:41:51,973 - gcsBot - INFO - INICIANDO CICLO DE WFO #2
+2025-06-27 14:41:51,973 - gcsBot - INFO -   - Período de Treino: 2018-01-08 a 2018-02-06
+2025-06-27 14:41:51,974 - gcsBot - INFO -   - Período de Teste:  2018-02-07 a 2018-02-13
+2025-06-27 14:41:51,974 - gcsBot - INFO -   - Otimizando parâmetros com Optuna (25 trials)...
+2025-06-27 14:50:58,118 - gcsBot - INFO - ---------- CONFIGURAÇÃO CARREGADA ----------
+2025-06-27 14:50:58,119 - gcsBot - INFO - MODO DE EXECUÇÃO: OPTIMIZE
+2025-06-27 14:50:58,119 - gcsBot - INFO - SÍMBOLO: BTCUSDT
+2025-06-27 14:50:58,119 - gcsBot - INFO - USANDO TESTNET: True
+2025-06-27 14:50:58,119 - gcsBot - INFO - WFO Janela de Treino: 43200 minutos (~30.0 dias)
+2025-06-27 14:50:58,119 - gcsBot - INFO - WFO Janela de Teste:  10080 minutos (~7.0 dias)
+2025-06-27 14:50:58,119 - gcsBot - INFO - WFO Passo da Janela:  10080 minutos (~7.0 dias)
+2025-06-27 14:50:58,119 - gcsBot - INFO - ------------------------------------------
+2025-06-27 14:51:00,415 - gcsBot - INFO - --- MODO OTIMIZAÇÃO WALK-FORWARD ---
+2025-06-27 14:51:00,751 - gcsBot - INFO - Cliente Binance inicializado no DataManager.
+2025-06-27 14:51:00,752 - gcsBot - INFO - Arquivo de dados local encontrado em 'data\full_historical_BTCUSDT_1m.csv'. Carregando e atualizando...
+2025-06-27 14:51:36,110 - gcsBot - INFO - Buscando novos dados da Binance para atualizar o arquivo local...
+2025-06-27 14:51:36,110 - gcsBot - INFO - Baixando lote da Binance: 2025-06-27 → 2025-06-27
+2025-06-27 14:52:37,197 - gcsBot - INFO - Arquivo atualizado com 12 novas velas.
+2025-06-27 14:52:37,348 - gcsBot - INFO - ================================================================================
+2025-06-27 14:52:37,349 - gcsBot - INFO - --- INICIANDO PROCESSO DE OTIMIZAÇÃO WALK-FORWARD (WFO) ---
+2025-06-27 14:52:37,350 - gcsBot - INFO - ================================================================================
+2025-06-27 14:52:37,370 - gcsBot - INFO - ==================================================
+2025-06-27 14:52:37,371 - gcsBot - INFO - Estado de otimização anterior encontrado! Retomando do ciclo #2.
+2025-06-27 14:52:37,371 - gcsBot - INFO - ==================================================
+2025-06-27 14:52:37,372 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 14:52:37,373 - gcsBot - INFO - INICIANDO CICLO DE WFO #2
+2025-06-27 14:52:37,373 - gcsBot - INFO -   - Período de Treino: 2018-01-08 a 2018-02-06
+2025-06-27 14:52:37,373 - gcsBot - INFO -   - Período de Teste:  2018-02-07 a 2018-02-13
+2025-06-27 14:52:37,374 - gcsBot - INFO -   - Otimizando parâmetros com Optuna...
+2025-06-27 15:02:44,204 - gcsBot - INFO - 
+  - Otimização do ciclo #2 concluída.
+2025-06-27 15:02:44,206 - gcsBot - INFO -   - Melhor Resultado (Sharpe no Treino): 0.5251
+2025-06-27 15:02:44,207 - gcsBot - INFO -   - Melhores Parâmetros Encontrados:
+2025-06-27 15:02:44,207 - gcsBot - INFO -     - n_estimators: 155
+2025-06-27 15:02:44,207 - gcsBot - INFO -     - max_depth: 21
+2025-06-27 15:02:44,208 - gcsBot - INFO -     - min_samples_leaf: 17
+2025-06-27 15:02:44,208 - gcsBot - INFO -     - future_periods: 11
+2025-06-27 15:02:44,208 - gcsBot - INFO -     - profit_mult: 1.462198
+2025-06-27 15:02:44,208 - gcsBot - INFO -     - stop_mult: 2.846172
+2025-06-27 15:02:44,208 - gcsBot - INFO -     - profit_threshold: 0.010901
+2025-06-27 15:02:44,209 - gcsBot - INFO -     - stop_loss_threshold: 0.025677
+2025-06-27 15:02:44,209 - gcsBot - INFO -     - prediction_confidence: 0.647949
+2025-06-27 15:02:44,209 - gcsBot - INFO -   - Treinando modelo final do ciclo com os melhores parâmetros...
+2025-06-27 15:03:08,600 - gcsBot - INFO -   - Executando backtest no período de teste (fora da amostra)...
+2025-06-27 15:03:08,818 - gcsBot - INFO - ------------------------- RESULTADO DO CICLO 2 --------------------------
+2025-06-27 15:03:08,818 - gcsBot - INFO -   - Capital Final: $100.25 (Retorno de 0.25%)
+2025-06-27 15:03:08,819 - gcsBot - INFO -   - Trades Executados: 16
+2025-06-27 15:03:08,819 - gcsBot - INFO -   - Sharpe Ratio (Anualizado): 0.53
+2025-06-27 15:03:08,819 - gcsBot - INFO - --------------------------------------------------------------------------------
+2025-06-27 15:03:08,820 - gcsBot - INFO - Estado da WFO salvo. Ciclo #2 completo.
+2025-06-27 15:03:08,821 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 15:03:08,821 - gcsBot - INFO - INICIANDO CICLO DE WFO #3
+2025-06-27 15:03:08,821 - gcsBot - INFO -   - Período de Treino: 2018-01-15 a 2018-02-13
+2025-06-27 15:03:08,821 - gcsBot - INFO -   - Período de Teste:  2018-02-14 a 2018-02-20
+2025-06-27 15:03:08,821 - gcsBot - INFO -   - Otimizando parâmetros com Optuna...
+2025-06-27 15:13:00,765 - gcsBot - INFO - 
+  - Otimização do ciclo #3 concluída.
+2025-06-27 15:13:00,765 - gcsBot - INFO -   - Melhor Resultado (Sharpe no Treino): 9.5383
+2025-06-27 15:13:00,765 - gcsBot - INFO -   - Melhores Parâmetros Encontrados:
+2025-06-27 15:13:00,766 - gcsBot - INFO -     - n_estimators: 81
+2025-06-27 15:13:00,766 - gcsBot - INFO -     - max_depth: 19
+2025-06-27 15:13:00,766 - gcsBot - INFO -     - min_samples_leaf: 5
+2025-06-27 15:13:00,766 - gcsBot - INFO -     - future_periods: 53
+2025-06-27 15:13:00,766 - gcsBot - INFO -     - profit_mult: 2.986547
+2025-06-27 15:13:00,766 - gcsBot - INFO -     - stop_mult: 2.399627
+2025-06-27 15:13:00,767 - gcsBot - INFO -     - profit_threshold: 0.012213
+2025-06-27 15:13:00,767 - gcsBot - INFO -     - stop_loss_threshold: 0.020142
+2025-06-27 15:13:00,767 - gcsBot - INFO -     - prediction_confidence: 0.779154
+2025-06-27 15:13:00,767 - gcsBot - INFO -   - Treinando modelo final do ciclo com os melhores parâmetros...
+2025-06-27 15:13:22,608 - gcsBot - INFO -   - Executando backtest no período de teste (fora da amostra)...
+2025-06-27 15:13:22,797 - gcsBot - INFO - ------------------------- RESULTADO DO CICLO 3 --------------------------
+2025-06-27 15:13:22,797 - gcsBot - INFO -   - Capital Final: $104.48 (Retorno de 4.48%)
+2025-06-27 15:13:22,797 - gcsBot - INFO -   - Trades Executados: 8
+2025-06-27 15:13:22,798 - gcsBot - INFO -   - Sharpe Ratio (Anualizado): 9.54
+2025-06-27 15:13:22,798 - gcsBot - INFO - --------------------------------------------------------------------------------
+2025-06-27 15:13:22,799 - gcsBot - INFO - Estado da WFO salvo. Ciclo #3 completo.
+2025-06-27 15:13:22,799 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 15:13:22,800 - gcsBot - INFO - INICIANDO CICLO DE WFO #4
+2025-06-27 15:13:22,800 - gcsBot - INFO -   - Período de Treino: 2018-01-22 a 2018-02-20
+2025-06-27 15:13:22,800 - gcsBot - INFO -   - Período de Teste:  2018-02-21 a 2018-02-27
+2025-06-27 15:13:22,800 - gcsBot - INFO -   - Otimizando parâmetros com Optuna...
+2025-06-27 15:23:55,642 - gcsBot - INFO - 
+  - Otimização do ciclo #4 concluída.
+2025-06-27 15:23:55,642 - gcsBot - INFO -   - Melhor Resultado (Sharpe no Treino): 0.0000
+2025-06-27 15:23:55,642 - gcsBot - INFO -   - Melhores Parâmetros Encontrados:
+2025-06-27 15:23:55,642 - gcsBot - INFO -     - n_estimators: 124
+2025-06-27 15:23:55,643 - gcsBot - INFO -     - max_depth: 13
+2025-06-27 15:23:55,643 - gcsBot - INFO -     - min_samples_leaf: 20
+2025-06-27 15:23:55,643 - gcsBot - INFO -     - future_periods: 53
+2025-06-27 15:23:55,643 - gcsBot - INFO -     - profit_mult: 2.606112
+2025-06-27 15:23:55,643 - gcsBot - INFO -     - stop_mult: 1.075445
+2025-06-27 15:23:55,643 - gcsBot - INFO -     - profit_threshold: 0.017473
+2025-06-27 15:23:55,643 - gcsBot - INFO -     - stop_loss_threshold: 0.020001
+2025-06-27 15:23:55,644 - gcsBot - INFO -     - prediction_confidence: 0.801232
+2025-06-27 15:23:55,644 - gcsBot - WARNING -   - Melhor resultado do ciclo não foi positivo. Pulando para o próximo ciclo.
+2025-06-27 15:23:55,644 - gcsBot - INFO - Estado da WFO salvo. Ciclo #4 completo.
+2025-06-27 15:23:55,645 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 15:23:55,645 - gcsBot - INFO - INICIANDO CICLO DE WFO #5
+2025-06-27 15:23:55,645 - gcsBot - INFO -   - Período de Treino: 2018-01-29 a 2018-02-27
+2025-06-27 15:23:55,646 - gcsBot - INFO -   - Período de Teste:  2018-02-28 a 2018-03-06
+2025-06-27 15:23:55,646 - gcsBot - INFO -   - Otimizando parâmetros com Optuna...
+2025-06-27 15:34:59,208 - gcsBot - INFO - 
+  - Otimização do ciclo #5 concluída.
+2025-06-27 15:34:59,209 - gcsBot - INFO -   - Melhor Resultado (Sharpe no Treino): 1.0381
+2025-06-27 15:34:59,209 - gcsBot - INFO -   - Melhores Parâmetros Encontrados:
+2025-06-27 15:34:59,209 - gcsBot - INFO -     - n_estimators: 91
+2025-06-27 15:34:59,209 - gcsBot - INFO -     - max_depth: 15
+2025-06-27 15:34:59,209 - gcsBot - INFO -     - min_samples_leaf: 13
+2025-06-27 15:34:59,210 - gcsBot - INFO -     - future_periods: 60
+2025-06-27 15:34:59,210 - gcsBot - INFO -     - profit_mult: 2.814846
+2025-06-27 15:34:59,210 - gcsBot - INFO -     - stop_mult: 1.587163
+2025-06-27 15:34:59,210 - gcsBot - INFO -     - profit_threshold: 0.023969
+2025-06-27 15:34:59,210 - gcsBot - INFO -     - stop_loss_threshold: 0.014613
+2025-06-27 15:34:59,211 - gcsBot - INFO -     - prediction_confidence: 0.781839
+2025-06-27 15:34:59,211 - gcsBot - INFO -   - Treinando modelo final do ciclo com os melhores parâmetros...
+2025-06-27 15:35:24,553 - gcsBot - INFO -   - Executando backtest no período de teste (fora da amostra)...
+2025-06-27 15:35:24,764 - gcsBot - INFO - ------------------------- RESULTADO DO CICLO 5 --------------------------
+2025-06-27 15:35:24,764 - gcsBot - INFO -   - Capital Final: $100.69 (Retorno de 0.69%)
+2025-06-27 15:35:24,764 - gcsBot - INFO -   - Trades Executados: 12
+2025-06-27 15:35:24,765 - gcsBot - INFO -   - Sharpe Ratio (Anualizado): 1.04
+2025-06-27 15:35:24,765 - gcsBot - INFO - --------------------------------------------------------------------------------
+2025-06-27 15:35:24,766 - gcsBot - INFO - Estado da WFO salvo. Ciclo #5 completo.
+2025-06-27 15:35:24,767 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 15:35:24,768 - gcsBot - INFO - INICIANDO CICLO DE WFO #6
+2025-06-27 15:35:24,768 - gcsBot - INFO -   - Período de Treino: 2018-02-05 a 2018-03-06
+2025-06-27 15:35:24,769 - gcsBot - INFO -   - Período de Teste:  2018-03-07 a 2018-03-13
+2025-06-27 15:35:24,769 - gcsBot - INFO -   - Otimizando parâmetros com Optuna...
+2025-06-27 15:46:55,713 - gcsBot - INFO - 
+  - Otimização do ciclo #6 concluída.
+2025-06-27 15:46:55,713 - gcsBot - INFO -   - Melhor Resultado (Sharpe no Treino): 0.4318
+2025-06-27 15:46:55,714 - gcsBot - INFO -   - Melhores Parâmetros Encontrados:
+2025-06-27 15:46:55,714 - gcsBot - INFO -     - n_estimators: 208
+2025-06-27 15:46:55,714 - gcsBot - INFO -     - max_depth: 9
+2025-06-27 15:46:55,714 - gcsBot - INFO -     - min_samples_leaf: 9
+2025-06-27 15:46:55,714 - gcsBot - INFO -     - future_periods: 31
+2025-06-27 15:46:55,715 - gcsBot - INFO -     - profit_mult: 2.637102
+2025-06-27 15:46:55,715 - gcsBot - INFO -     - stop_mult: 2.156024
+2025-06-27 15:46:55,715 - gcsBot - INFO -     - profit_threshold: 0.017247
+2025-06-27 15:46:55,715 - gcsBot - INFO -     - stop_loss_threshold: 0.013213
+2025-06-27 15:46:55,715 - gcsBot - INFO -     - prediction_confidence: 0.616345
+2025-06-27 15:46:55,716 - gcsBot - INFO -   - Treinando modelo final do ciclo com os melhores parâmetros...
+2025-06-27 15:47:31,163 - gcsBot - INFO -   - Executando backtest no período de teste (fora da amostra)...
+2025-06-27 15:47:31,381 - gcsBot - INFO - ------------------------- RESULTADO DO CICLO 6 --------------------------
+2025-06-27 15:47:31,381 - gcsBot - INFO -   - Capital Final: $100.11 (Retorno de 0.11%)
+2025-06-27 15:47:31,381 - gcsBot - INFO -   - Trades Executados: 4
+2025-06-27 15:47:31,382 - gcsBot - INFO -   - Sharpe Ratio (Anualizado): 0.43
+2025-06-27 15:47:31,382 - gcsBot - INFO - --------------------------------------------------------------------------------
+2025-06-27 15:47:31,383 - gcsBot - INFO - Estado da WFO salvo. Ciclo #6 completo.
+2025-06-27 15:47:31,383 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 15:47:31,384 - gcsBot - INFO - INICIANDO CICLO DE WFO #7
+2025-06-27 15:47:31,384 - gcsBot - INFO -   - Período de Treino: 2018-02-12 a 2018-03-13
+2025-06-27 15:47:31,384 - gcsBot - INFO -   - Período de Teste:  2018-03-14 a 2018-03-20
+2025-06-27 15:47:31,384 - gcsBot - INFO -   - Otimizando parâmetros com Optuna...
+2025-06-27 15:58:44,165 - gcsBot - INFO - 
+  - Otimização do ciclo #7 concluída.
+2025-06-27 15:58:44,165 - gcsBot - INFO -   - Melhor Resultado (Sharpe no Treino): 10.9587
+2025-06-27 15:58:44,166 - gcsBot - INFO -   - Melhores Parâmetros Encontrados:
+2025-06-27 15:58:44,166 - gcsBot - INFO -     - n_estimators: 209
+2025-06-27 15:58:44,166 - gcsBot - INFO -     - max_depth: 23
+2025-06-27 15:58:44,166 - gcsBot - INFO -     - min_samples_leaf: 9
+2025-06-27 15:58:44,166 - gcsBot - INFO -     - future_periods: 39
+2025-06-27 15:58:44,167 - gcsBot - INFO -     - profit_mult: 2.000435
+2025-06-27 15:58:44,171 - gcsBot - INFO -     - stop_mult: 1.946701
+2025-06-27 15:58:44,171 - gcsBot - INFO -     - profit_threshold: 0.006941
+2025-06-27 15:58:44,171 - gcsBot - INFO -     - stop_loss_threshold: 0.026300
+2025-06-27 15:58:44,171 - gcsBot - INFO -     - prediction_confidence: 0.808354
+2025-06-27 15:58:44,171 - gcsBot - INFO -   - Treinando modelo final do ciclo com os melhores parâmetros...
+2025-06-27 15:59:10,039 - gcsBot - INFO -   - Executando backtest no período de teste (fora da amostra)...
+2025-06-27 15:59:10,278 - gcsBot - INFO - ------------------------- RESULTADO DO CICLO 7 --------------------------
+2025-06-27 15:59:10,278 - gcsBot - INFO -   - Capital Final: $104.68 (Retorno de 4.68%)
+2025-06-27 15:59:10,279 - gcsBot - INFO -   - Trades Executados: 14
+2025-06-27 15:59:10,279 - gcsBot - INFO -   - Sharpe Ratio (Anualizado): 10.96
+2025-06-27 15:59:10,279 - gcsBot - INFO - --------------------------------------------------------------------------------
+2025-06-27 15:59:10,280 - gcsBot - INFO - Estado da WFO salvo. Ciclo #7 completo.
+2025-06-27 15:59:10,281 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 15:59:10,281 - gcsBot - INFO - INICIANDO CICLO DE WFO #8
+2025-06-27 15:59:10,281 - gcsBot - INFO -   - Período de Treino: 2018-02-19 a 2018-03-20
+2025-06-27 15:59:10,281 - gcsBot - INFO -   - Período de Teste:  2018-03-21 a 2018-03-27
+2025-06-27 15:59:10,281 - gcsBot - INFO -   - Otimizando parâmetros com Optuna...
+2025-06-27 16:09:15,777 - gcsBot - INFO - 
+  - Otimização do ciclo #8 concluída.
+2025-06-27 16:09:15,777 - gcsBot - INFO -   - Melhor Resultado (Sharpe no Treino): 0.0000
+2025-06-27 16:09:15,777 - gcsBot - INFO -   - Melhores Parâmetros Encontrados:
+2025-06-27 16:09:15,777 - gcsBot - INFO -     - n_estimators: 203
+2025-06-27 16:09:15,778 - gcsBot - INFO -     - max_depth: 10
+2025-06-27 16:09:15,778 - gcsBot - INFO -     - min_samples_leaf: 6
+2025-06-27 16:09:15,778 - gcsBot - INFO -     - future_periods: 47
+2025-06-27 16:09:15,778 - gcsBot - INFO -     - profit_mult: 2.555802
+2025-06-27 16:09:15,778 - gcsBot - INFO -     - stop_mult: 1.066013
+2025-06-27 16:09:15,778 - gcsBot - INFO -     - profit_threshold: 0.017430
+2025-06-27 16:09:15,778 - gcsBot - INFO -     - stop_loss_threshold: 0.023205
+2025-06-27 16:09:15,779 - gcsBot - INFO -     - prediction_confidence: 0.710546
+2025-06-27 16:09:15,779 - gcsBot - WARNING -   - Melhor resultado do ciclo não foi positivo. Pulando para o próximo ciclo.
+2025-06-27 16:09:15,780 - gcsBot - INFO - Estado da WFO salvo. Ciclo #8 completo.
+2025-06-27 16:09:15,780 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 16:09:15,780 - gcsBot - INFO - INICIANDO CICLO DE WFO #9
+2025-06-27 16:09:15,780 - gcsBot - INFO -   - Período de Treino: 2018-02-26 a 2018-03-27
+2025-06-27 16:09:15,780 - gcsBot - INFO -   - Período de Teste:  2018-03-28 a 2018-04-03
+2025-06-27 16:09:15,781 - gcsBot - INFO -   - Otimizando parâmetros com Optuna...
+2025-06-27 16:19:22,178 - gcsBot - INFO - 
+  - Otimização do ciclo #9 concluída.
+2025-06-27 16:19:22,179 - gcsBot - INFO -   - Melhor Resultado (Sharpe no Treino): 0.0000
+2025-06-27 16:19:22,179 - gcsBot - INFO -   - Melhores Parâmetros Encontrados:
+2025-06-27 16:19:22,179 - gcsBot - INFO -     - n_estimators: 163
+2025-06-27 16:19:22,179 - gcsBot - INFO -     - max_depth: 8
+2025-06-27 16:19:22,179 - gcsBot - INFO -     - min_samples_leaf: 10
+2025-06-27 16:19:22,179 - gcsBot - INFO -     - future_periods: 56
+2025-06-27 16:19:22,180 - gcsBot - INFO -     - profit_mult: 2.321685
+2025-06-27 16:19:22,180 - gcsBot - INFO -     - stop_mult: 1.411901
+2025-06-27 16:19:22,180 - gcsBot - INFO -     - profit_threshold: 0.027599
+2025-06-27 16:19:22,180 - gcsBot - INFO -     - stop_loss_threshold: 0.029342
+2025-06-27 16:19:22,180 - gcsBot - INFO -     - prediction_confidence: 0.855198
+2025-06-27 16:19:22,180 - gcsBot - WARNING -   - Melhor resultado do ciclo não foi positivo. Pulando para o próximo ciclo.
+2025-06-27 16:19:22,181 - gcsBot - INFO - Estado da WFO salvo. Ciclo #9 completo.
+2025-06-27 16:19:22,181 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 16:19:22,182 - gcsBot - INFO - INICIANDO CICLO DE WFO #10
+2025-06-27 16:19:22,182 - gcsBot - INFO -   - Período de Treino: 2018-03-05 a 2018-04-03
+2025-06-27 16:19:22,182 - gcsBot - INFO -   - Período de Teste:  2018-04-04 a 2018-04-10
+2025-06-27 16:19:22,182 - gcsBot - INFO -   - Otimizando parâmetros com Optuna...
+2025-06-27 16:28:25,463 - gcsBot - WARNING - 
+==================================================
+2025-06-27 16:28:25,555 - gcsBot - WARNING - PARADA SOLICITADA! Finalizando o trial atual...
+2025-06-27 16:28:25,637 - gcsBot - WARNING - O processo será encerrado de forma limpa antes do próximo ciclo de WFO.
+2025-06-27 16:28:25,722 - gcsBot - WARNING - O progresso até o último ciclo completo foi salvo.
+2025-06-27 16:28:25,757 - gcsBot - WARNING - ==================================================
+2025-06-27 16:28:53,304 - gcsBot - INFO - 
+
+================================================================================
+2025-06-27 16:28:53,305 - gcsBot - INFO - --- OTIMIZAÇÃO WALK-FORWARD CONCLUÍDA ---
+2025-06-27 16:28:53,305 - gcsBot - INFO - ================================================================================
+2025-06-27 16:28:53,305 - gcsBot - INFO - --- RESULTADO CONSOLIDADO POR PERÍODO ---
+2025-06-27 16:28:53,305 - gcsBot - INFO -   - Período: 2018-01-31_a_2018-02-06 | Trades:  10 | Resultado: +4.75% | Sharpe: 9.80
+2025-06-27 16:28:53,305 - gcsBot - INFO -   - Período: 2018-02-07_a_2018-02-13 | Trades:  16 | Resultado: +0.25% | Sharpe: 0.53
+2025-06-27 16:28:53,305 - gcsBot - INFO -   - Período: 2018-02-14_a_2018-02-20 | Trades:   8 | Resultado: +4.48% | Sharpe: 9.54
+2025-06-27 16:28:53,306 - gcsBot - INFO -   - Período: 2018-02-28_a_2018-03-06 | Trades:  12 | Resultado: +0.69% | Sharpe: 1.04
+2025-06-27 16:28:53,306 - gcsBot - INFO -   - Período: 2018-03-07_a_2018-03-13 | Trades:   4 | Resultado: +0.11% | Sharpe: 0.43
+2025-06-27 16:28:53,306 - gcsBot - INFO -   - Período: 2018-03-14_a_2018-03-20 | Trades:  14 | Resultado: +4.68% | Sharpe: 10.96
+2025-06-27 16:28:53,306 - gcsBot - INFO - 
+--------------------------------------------------------------------------------
+2025-06-27 16:28:53,306 - gcsBot - INFO - --- RESUMO ESTATÍSTICO GERAL ---
+2025-06-27 16:28:53,306 - gcsBot - INFO -   - Total de Ciclos de WFO Completos: 6
+2025-06-27 16:28:53,307 - gcsBot - INFO -   - Capital Final Acumulado (Simulado): $115.77
+2025-06-27 16:28:53,307 - gcsBot - INFO -   - Lucro Total no Período Simulado: +15.77%
+2025-06-27 16:28:53,307 - gcsBot - INFO -   - Total de Trades em todos os ciclos: 64
+2025-06-27 16:28:53,307 - gcsBot - INFO -   - Média do Sharpe Ratio nos períodos de teste: 5.38
+2025-06-27 16:28:53,313 - gcsBot - INFO -   - Mediana do Sharpe Ratio nos períodos de teste: 5.29
+2025-06-27 16:28:53,313 - gcsBot - INFO -   - Taxa de Sucesso (Ciclos com Lucro): 100.00%
+2025-06-27 16:28:53,313 - gcsBot - INFO - --------------------------------------------------------------------------------
+2025-06-27 16:28:53,313 - gcsBot - INFO - Salvando o modelo e o normalizador do último ciclo bem-sucedido...
+2025-06-27 16:28:53,419 - gcsBot - INFO - ✅ Modelo final e robusto salvo em 'data\trading_model.pkl'
