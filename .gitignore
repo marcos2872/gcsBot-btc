@@ -1,0 +1,29 @@
+# ===================================================
+# Arquivos e Pastas Gerados - IGNORAR COMPLETAMENTE
+# ===================================================
+
+# Ignora a pasta de dados e TUDO dentro dela.
+# Isso inclui os CSVs, os modelos .pkl e os arquivos de estado .json
+/data/
+
+# Ignora a pasta de logs e TUDO dentro dela.
+/logs/
+
+
+# ===================================================
+# Arquivos de Cache e Ambiente Python
+# ===================================================
+
+# Ignora todas as pastas de cache do Python, onde quer que estejam.
+**/__pycache__/
+
+# Ignora outros arquivos de cache do Python
+*.pyc
+*.pyo
+
+# Ignora pastas de ambiente virtual (boa prática)
+venv/
+.venv/
+
+# Ignora arquivos de configuração do editor (ex: VSCode)
+.vscode/

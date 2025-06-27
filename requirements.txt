@@ -1,7 +1,10 @@
 # requirements.txt
-python-binance
+python-dotenv
 pandas
 scikit-learn
 numpy
-python-dotenv
 joblib
+python-binance
+ccxt
+optuna
+ta
