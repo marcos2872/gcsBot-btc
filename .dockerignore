@@ -1,0 +1,29 @@
+# Arquivo .dockerignore
+# Lista de arquivos e pastas a serem IGNORADOS pelo Docker na hora de construir a imagem.
+# Isso mantém a imagem final leve e segura.
+
+__pycache__/
+*.pyc
+*.pyo
+*.pkl
+*.json
+*.csv
+
+# Ignorar a pasta de dados inteira. 
+# Ela será criada DENTRO do container, não queremos levar a local.
+/data/
+
+# Ignorar os logs locais
+/logs/
+
+# Ignorar ambientes virtuais
+.venv/
+venv/
+
+# Configurações de IDE
+.vscode/
+.idea/
+
+# Arquivos do Git
+.git
+.gitignore

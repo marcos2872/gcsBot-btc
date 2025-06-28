@@ -9,3 +9,5 @@ ccxt
 optuna
 ta
 numba
+yfinance
+lightgbm

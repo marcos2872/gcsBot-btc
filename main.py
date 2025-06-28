@@ -1,34 +1,74 @@
 # main.py
 
 import sys
+import os
+
+import pandas as pd
 from src.config import MODE, SYMBOL
 from src.logger import logger
-from src.data_manager import DataManager
-from src.optimizer import WalkForwardOptimizer
 
 def main():
+    """
+    Ponto de entrada principal do bot.
+    Lê o modo de operação do arquivo de configuração e inicia o processo correspondente.
+    """
+    
+    # Garante que o diretório de dados existe, crucial para salvar modelos e logs.
+    os.makedirs("data", exist_ok=True)
+    os.makedirs("logs", exist_ok=True)
+
     if MODE == 'optimize':
-        logger.info("--- MODO OTIMIZAÇÃO WALK-FORWARD ---")
+        logger.info("--- MODO: OTIMIZAÇÃO WALK-FORWARD ---")
+        logger.info("Iniciando o processo de otimização para encontrar os melhores parâmetros...")
+        
+        # Importações específicas para este modo para manter o código limpo
+        from src.data_manager import DataManager
+        from src.optimizer import WalkForwardOptimizer
+        
         dm = DataManager()
-        # O método agora não precisa mais do days_to_load
-        df = dm.update_and_load_data(SYMBOL, '1m') 
-        df = df[df.index >= '2018-01-01']
-        if df.empty:
-            logger.error("Sem dados para otimizar. Abortando.")
+        # Carrega todo o histórico de dados disponível, combinando fontes e atualizando com o mais recente
+        full_historical_data = dm.update_and_load_data(SYMBOL, '1m')
+        
+        # Filtra para usar dados a partir de 2018 para relevância, se disponível
+        if not full_historical_data.empty and pd.to_datetime("2018-01-01", utc=True) < full_historical_data.index.max():
+             full_historical_data = full_historical_data[full_historical_data.index >= '2018-01-01']
+
+        if full_historical_data.empty:
+            logger.error("Não há dados disponíveis para otimizar. Verifique a conexão ou os arquivos de dados. Abortando.")
             sys.exit(1)
-        optimizer = WalkForwardOptimizer(df)
+            
+        optimizer = WalkForwardOptimizer(full_historical_data)
         optimizer.run()
 
-    elif MODE == 'trade':
+    elif MODE == 'test' or MODE == 'trade':
+        logger.info(f"--- MODO: {MODE.upper()} ---")
+        
+        if MODE == 'test':
+            logger.info("************************************************************")
+            logger.info(">>> OPERANDO NA BINANCE TESTNET (CARTEIRA DE TESTE) <<<")
+            logger.info("************************************************************")
+        else: # modo 'trade'
+            logger.warning("************************************************************")
+            logger.warning(">>> ATENÇÃO: OPERANDO NA BINANCE REAL (CARTEIRA REAL) <<<")
+            logger.warning("************************************************************")
+
+        # Importa o bot de trading
         from src.trading_bot import TradingBot
-        logger.info("--- MODO TRADING ---")
+        
         bot = TradingBot()
         bot.run()
 
     else:
-        # A validação agora está no config.py, mas é bom manter um fallback.
-        logger.error("Modo inválido. Use 'optimize' ou 'trade'.")
+        # Esta verificação é um fallback, já que o config.py deve barrar modos inválidos
+        logger.error(f"Modo '{MODE}' não reconhecido no .env. Use 'optimize', 'test', ou 'trade'.")
         sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        logger.info("Execução interrompida pelo usuário.")
+        sys.exit(0)
+    except Exception as e:
+        logger.error(f"Um erro crítico encerrou a aplicação: {e}", exc_info=True)
+        sys.exit(1)

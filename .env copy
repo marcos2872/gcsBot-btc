@@ -6,11 +6,10 @@ BINANCE_TESTNET_API_KEY = 'eJ0cn2eMD7xji9EBngH9swgwTUUbBR3EC5VA1rq02dlc3CFdCywtE
 BINANCE_TESTNET_API_SECRET = 'FeJyfQnNYFkwUsB1KG0XDd5tFO9g46ioYA1mKUavlm0hb4kQgXIEs6FfMrbkxLqY'
 
 # --- CONFIGURAÇÕES DE EXECUÇÃO ---
-# MODE: 'train' para treinar o modelo, 'trade' para operar
+# MODO: optimize, test, trade
 MODE='optimize'
+#MODE='train'
 
-# USE_TESTNET: 'True' para usar a Testnet da Binance, 'False' para a rede real
-USE_TESTNET=True
 
 # SYMBOL: O par de moedas para operar
 SYMBOL='BTCUSDT'
