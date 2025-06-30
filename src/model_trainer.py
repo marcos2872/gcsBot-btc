@@ -11,7 +11,7 @@ from src.logger import logger
 from src.config import MODEL_FILE, SCALER_FILE
 from ta.volatility import BollingerBands, AverageTrueRange
 from ta.trend import MACD, ADXIndicator
-from ta.momentum import StochasticOscillator
+from ta.momentum import StochasticOscillator, RSIIndicator
 
 @jit(nopython=True)
 def create_labels_triple_barrier(
@@ -62,7 +62,7 @@ class ModelTrainer:
         # Lista definitiva de features. A "mente" completa do bot.
         self.feature_names = [
             'sma_7', 'sma_25', 'rsi', 'price_change_1m', 'price_change_5m',
-            'bb_width', 'bb_pband', # Adicionada a feature %B (pband)
+            'bb_width', 'bb_pband', # Adicionada a feature %B (pband) para sagacidade
             'atr', 'macd_diff', 'stoch_osc',
             'adx', 'adx_pos', 'adx_neg', # Features de Regime de Mercado
             'dxy_close_change', 'vix_close_change', # Features Macro
@@ -92,15 +92,12 @@ class ModelTrainer:
         # --- Momento ---
         df['price_change_1m'] = df['close'].pct_change(1)
         df['price_change_5m'] = df['close'].pct_change(5)
-        delta = df['close'].diff()
-        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-        df['rsi'] = 100 - (100 / (1 + (gain / (loss + epsilon))))
+        df['rsi'] = RSIIndicator(close=df['close'], window=14).rsi()
         df['stoch_osc'] = StochasticOscillator(high=df['high'], low=df['low'], close=df['close']).stoch()
 
         # --- Features Macroeconômicas (Variação na última hora) ---
         macro_map = {
-            'dx_close': 'dxy_close_change',
+            'dxy_close': 'dxy_close_change',
             'vix_close': 'vix_close_change',
             'gc_close': 'gold_close_change',
             'tnx_close': 'tnx_close_change'
@@ -112,7 +109,6 @@ class ModelTrainer:
                 df[col_out] = 0 # Garante que a coluna exista mesmo que a busca de dados falhe
         
         # --- CORREÇÃO CRÍTICA: ELIMINAÇÃO DO LOOK-AHEAD BIAS ---
-        # Desloca todas as colunas de features em uma vela para o futuro.
         df[self.feature_names] = df[self.feature_names].shift(1)
         
         # Limpeza final de dados

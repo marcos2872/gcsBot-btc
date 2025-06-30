@@ -5,10 +5,10 @@ import pandas as pd
 from src.logger import logger
 
 # --- Constantes de Custo Operacional ---
-# Taxa padrão da Binance para ordens a mercado (0.1%)
+# Taxa padrão da Binance para ordens a mercado (0.1% ou 0.001)
 FEE_RATE = 0.001
 # Estimativa de derrapagem (slippage) para ordens a mercado em um ativo líquido como BTC.
-# Um valor conservador, mas realista.
+# Um valor conservador, mas realista, de 0.05%
 SLIPPAGE_RATE = 0.0005
 
 def run_backtest(model, scaler, test_data: pd.DataFrame, strategy_params: dict, feature_names: list):
