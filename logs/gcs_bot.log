@@ -1580,3 +1580,51 @@ TypeError: run_backtest() got an unexpected keyword argument 'test_data'
 2025-07-01 14:10:03,081 - gcsBot - INFO - Iniciando o processo de otimização para encontrar os melhores parâmetros...
 2025-07-01 14:10:05,434 - gcsBot - INFO - Cliente Binance inicializado e conexão com a API confirmada.
 2025-07-01 14:10:05,435 - gcsBot - INFO - Arquivo de dados local do BTC encontrado em 'data/full_historical_BTCUSDT.csv'. Carregando...
+2025-07-01 16:45:44,629 - gcsBot - INFO - Logger configurado para o modo: 'BACKTEST'
+2025-07-01 16:45:44,634 - gcsBot - INFO - --- MODO: BACKTEST RÁPIDO ---
+2025-07-01 16:45:47,694 - gcsBot - INFO - MODO OFFLINE FORÇADO está ativo. Nenhuma conexão com a API da Binance será tentada.
+2025-07-01 16:45:47,697 - gcsBot - ERROR - Um erro crítico encerrou a aplicação: 
+Traceback (most recent call last):
+  File "/app/main.py", line 75, in <module>
+    main()
+  File "/app/main.py", line 48, in main
+    tester.run(start_date_str=BACKTEST_START_DATE, end_date_str=BACKTEST_END_DATE)
+  File "/app/src/quick_tester.py", line 92, in run
+    if not self.load_model_and_params():
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/quick_tester.py", line 33, in load_model_and_params
+    self.model = joblib.load(MODEL_FILE)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/joblib/numpy_pickle.py", line 749, in load
+    obj = _unpickle(
+          ^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/joblib/numpy_pickle.py", line 626, in _unpickle
+    obj = unpickler.load()
+          ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/pickle.py", line 1254, in load
+    raise EOFError
+EOFError
+2025-07-01 16:46:27,613 - gcsBot - INFO - Logger configurado para o modo: 'BACKTEST'
+2025-07-01 16:46:27,615 - gcsBot - INFO - --- MODO: BACKTEST RÁPIDO ---
+2025-07-01 16:46:30,049 - gcsBot - INFO - Cliente Binance inicializado e conexão com a API confirmada.
+2025-07-01 16:46:30,059 - gcsBot - ERROR - Um erro crítico encerrou a aplicação: 
+Traceback (most recent call last):
+  File "/app/main.py", line 75, in <module>
+    main()
+  File "/app/main.py", line 48, in main
+    tester.run(start_date_str=BACKTEST_START_DATE, end_date_str=BACKTEST_END_DATE)
+  File "/app/src/quick_tester.py", line 92, in run
+    if not self.load_model_and_params():
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/quick_tester.py", line 33, in load_model_and_params
+    self.model = joblib.load(MODEL_FILE)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/joblib/numpy_pickle.py", line 749, in load
+    obj = _unpickle(
+          ^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/joblib/numpy_pickle.py", line 626, in _unpickle
+    obj = unpickler.load()
+          ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/pickle.py", line 1254, in load
+    raise EOFError
+EOFError
