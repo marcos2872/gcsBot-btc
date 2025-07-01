@@ -1,10 +1,10 @@
-# src/data_manager.py (VERSÃO OTIMIZADA)
+# src/data_manager.py (VERSÃO FINAL CORRIGIDA E SEGURA)
 
 import os
 import datetime
 import time
 import pandas as pd
-import numpy as np # Necessário para o downcasting
+import numpy as np
 from binance.client import Client
 from binance.exceptions import BinanceAPIException, BinanceRequestException
 from src.logger import logger
@@ -13,7 +13,6 @@ from src.config import (
     FORCE_OFFLINE_MODE, COMBINED_DATA_CACHE_FILE
 )
 
-# NOVO: Função auxiliar para otimização de memória
 def _optimize_memory_usage(df: pd.DataFrame) -> pd.DataFrame:
     """
     Itera sobre todas as colunas de um DataFrame e modifica o tipo de dado
@@ -43,7 +42,6 @@ def _optimize_memory_usage(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 class DataManager:
-    # ... (o resto da classe permanece o mesmo, exceto o final de update_and_load_data)
     def __init__(self):
         self.client = None
         if not FORCE_OFFLINE_MODE:
@@ -195,7 +193,8 @@ class DataManager:
             return pd.DataFrame()
         df_final = pd.concat(lista_dataframes, axis=1, join='outer')
         df_final.sort_index(inplace=True)
-        df_final.ffill(inplace=True)
+        # Apenas preenchimento para a frente é permitido para evitar look-ahead bias
+        df_final.ffill(inplace=True) 
         df_final.dropna(inplace=True)
         logger.info("Dados macro locais unificados com sucesso.")
         return df_final
@@ -216,7 +215,6 @@ class DataManager:
             
             if not df_cache.empty and df_cache.index.max() == last_btc_timestamp:
                 logger.info("✅ Cache está atualizado! Carregando dados unificados diretamente do cache.")
-                # ATUALIZADO: Otimiza a memória mesmo ao carregar do cache
                 return _optimize_memory_usage(df_cache)
             else:
                 logger.info("Cache está desatualizado. Reconstruindo...")
@@ -230,10 +228,11 @@ class DataManager:
         else:
             df_combined = df_btc
 
+        # --- CORREÇÃO CRÍTICA DE LOOK-AHEAD BIAS ---
+        # Apenas preenchemos para a frente. O valor de um dia é válido até que o próximo valor chegue.
+        # A linha `bfill` foi removida pois usava dados do futuro para preencher o passado.
         df_combined.ffill(inplace=True)
-        df_combined.bfill(inplace=True)
         
-        # ATUALIZADO: Otimiza a memória antes de salvar no cache
         df_combined = _optimize_memory_usage(df_combined)
         
         logger.info(f"Salvando dados unificados e otimizados no arquivo de cache: '{COMBINED_DATA_CACHE_FILE}'")

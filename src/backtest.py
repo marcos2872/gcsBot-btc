@@ -1,6 +1,9 @@
+# src/backtest.py
+
 import numpy as np
 import pandas as pd
 from src.logger import logger
+from src.config import RISK_PER_TRADE_PCT
 
 # --- Constantes de Custo Operacional ---
 FEE_RATE = 0.001
@@ -18,7 +21,7 @@ def run_backtest(model, scaler, test_data_with_features: pd.DataFrame, strategy_
     trade_count = 0
     portfolio_values = [] 
 
-    risk_per_trade_pct = strategy_params.get('risk_per_trade_pct', 0.02)
+    risk_per_trade = strategy_params.get('risk_per_trade_pct', RISK_PER_TRADE_PCT)
 
     for col in feature_names:
         if col not in test_data_with_features.columns:
@@ -26,20 +29,13 @@ def run_backtest(model, scaler, test_data_with_features: pd.DataFrame, strategy_
             
     X_test_features = test_data_with_features[feature_names].fillna(0)
     
-    # --- ATUALIZADO: Lógica para remover o UserWarning ---
-    # 1. Normaliza as features, o que resulta em uma matriz NumPy
     X_test_scaled_np = scaler.transform(X_test_features)
-    
-    # 2. Converte a matriz de volta para um DataFrame, preservando os nomes das colunas
     X_test_scaled_df = pd.DataFrame(X_test_scaled_np, index=X_test_features.index, columns=feature_names)
     
-    # 3. Gera as predições usando o DataFrame, que agora tem nomes de colunas válidos
     predictions_proba = model.predict_proba(X_test_scaled_df)
-    # --- Fim da atualização ---
-    
     predictions_buy_proba = pd.Series(predictions_proba[:, 1], index=X_test_features.index)
     
-    logger.debug(f"Iniciando backtest realista com {len(test_data_with_features)} velas e risco de {risk_per_trade_pct:.2%}.")
+    logger.debug(f"Iniciando backtest realista com {len(test_data_with_features)} velas e risco de {risk_per_trade:.2%}.")
 
     for date, row in test_data_with_features.iterrows():
         price = row['close']
@@ -59,7 +55,7 @@ def run_backtest(model, scaler, test_data_with_features: pd.DataFrame, strategy_
                 btc_amount, in_position, trade_count = 0.0, False, trade_count + 1
         
         elif predictions_buy_proba.get(date, 0) > strategy_params['prediction_confidence']:
-            trade_size_usdt = capital * risk_per_trade_pct
+            trade_size_usdt = capital * risk_per_trade
             
             if capital > 10 and trade_size_usdt > 10:
                 buy_price_with_slippage = price * (1 + SLIPPAGE_RATE)
@@ -80,8 +76,6 @@ def run_backtest(model, scaler, test_data_with_features: pd.DataFrame, strategy_
         return capital, -1.0
 
     portfolio_df = pd.DataFrame(portfolio_values).set_index('timestamp')
-    
-    # Usa 'h' minúsculo para ser compatível com futuras versões do pandas
     hourly_returns = portfolio_df['value'].resample('h').last().pct_change().dropna()
     
     if hourly_returns.std() == 0 or len(hourly_returns) < 2:
