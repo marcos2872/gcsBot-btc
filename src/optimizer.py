@@ -1,5 +1,4 @@
 # src/optimizer.py (AJUSTADO PARA SALVAR A CADA CICLO)
-
 import optuna
 import pandas as pd
 import numpy as np
@@ -68,23 +67,29 @@ class WalkForwardOptimizer:
     def _objective(self, trial, train_data, test_data):
         if self.shutdown_requested: raise optuna.exceptions.TrialPruned()
         
+        # ### AJUSTE ESTRATÉGICO 1: ESPAÇO DE BUSCA AMPLIADO ###
         all_params = {
-            'n_estimators': trial.suggest_int('n_estimators', 200, 800),
-            'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.2),
-            'num_leaves': trial.suggest_int('num_leaves', 30, 100),
-            'max_depth': trial.suggest_int('max_depth', 7, 25),
-            'min_child_samples': trial.suggest_int('min_child_samples', 20, 70),
-            'feature_fraction': trial.suggest_float('feature_fraction', 0.5, 1.0),
-            'bagging_fraction': trial.suggest_float('bagging_fraction', 0.5, 1.0),
-            'bagging_freq': trial.suggest_int('bagging_freq', 1, 7),
-            'lambda_l1': trial.suggest_float('lambda_l1', 1e-8, 10.0, log=True),
-            'lambda_l2': trial.suggest_float('lambda_l2', 1e-8, 10.0, log=True),
-            'future_periods': trial.suggest_int('future_periods', 5, 120),
-            'profit_mult': trial.suggest_float('profit_mult', 0.5, 5.0),
-            'stop_mult': trial.suggest_float('stop_mult', 0.5, 5.0),
-            'profit_threshold': trial.suggest_float('profit_threshold', 0.003, 0.05),
-            'stop_loss_threshold': trial.suggest_float('stop_loss_threshold', 0.003, 0.05),
-            'prediction_confidence': trial.suggest_float('prediction_confidence', 0.52, 0.90)
+            # Parâmetros do Modelo (LightGBM)
+            'n_estimators': trial.suggest_int('n_estimators', 100, 1000, step=100),
+            'learning_rate': trial.suggest_float('learning_rate', 0.005, 0.2),
+            'num_leaves': trial.suggest_int('num_leaves', 20, 150),
+            'max_depth': trial.suggest_int('max_depth', 5, 30),
+            'min_child_samples': trial.suggest_int('min_child_samples', 15, 80),
+            'feature_fraction': trial.suggest_float('feature_fraction', 0.4, 1.0),
+            'bagging_fraction': trial.suggest_float('bagging_fraction', 0.4, 1.0),
+            'bagging_freq': trial.suggest_int('bagging_freq', 1, 8),
+            'lambda_l1': trial.suggest_float('lambda_l1', 1e-8, 15.0, log=True),
+            'lambda_l2': trial.suggest_float('lambda_l2', 1e-8, 15.0, log=True),
+            
+            # Parâmetros da Barreira Tripla (Como o modelo aprende)
+            'future_periods': trial.suggest_int('future_periods', 5, 240, step=5),
+            'profit_mult': trial.suggest_float('profit_mult', 0.3, 7.0),
+            'stop_mult': trial.suggest_float('stop_mult', 0.3, 7.0),
+
+            # Parâmetros da Estratégia de Trading (Como o bot opera)
+            'profit_threshold': trial.suggest_float('profit_threshold', 0.002, 0.10),
+            'stop_loss_threshold': trial.suggest_float('stop_loss_threshold', 0.002, 0.10),
+            'prediction_confidence': trial.suggest_float('prediction_confidence', 0.505, 0.85)
         }
         
         model, scaler = self.trainer.train(train_data.copy(), all_params)
@@ -103,6 +108,8 @@ class WalkForwardOptimizer:
             'risk_per_trade_pct': RISK_PER_TRADE_PCT 
         }
         
+        # ### CORREÇÃO TÉCNICA 1: ERRO DE ARGUMENTO ###
+        # O nome do argumento foi alinhado com a definição da função em `backtest.py`
         capital, sharpe_ratio = run_backtest(
             model=model,
             scaler=scaler,
@@ -155,6 +162,7 @@ class WalkForwardOptimizer:
             best_trial = study.best_trial
             logger.info(f"\n  - Otimização do ciclo #{cycle} concluída. Melhor Sharpe (realista): {best_trial.value:.4f}")
 
+            # ### AJUSTE ESTRATÉGICO 2: SALVAMENTO DE MODELO POR CICLO ###
             if best_trial.value > 0.1:
                 logger.info("  - Treinando modelo final do ciclo com os melhores parâmetros...")
                 final_model, final_scaler = self.trainer.train(train_data.copy(), best_trial.params)
@@ -167,12 +175,10 @@ class WalkForwardOptimizer:
                         'risk_per_trade_pct': RISK_PER_TRADE_PCT
                     }
                     
-                    # --- ATUALIZADO: Lógica de salvamento movida para DENTRO do loop ---
                     logger.info("  - ✅ Modelo promissor encontrado! Salvando modelo e parâmetros deste ciclo...")
                     self.trainer.save_model(final_model, final_scaler)
                     with open(STRATEGY_PARAMS_FILE, 'w') as f:
                         json.dump(strategy_params, f, indent=4)
-                    # --- Fim da atualização ---
                     
                     logger.info("  - Executando backtest final no período de teste...")
                     test_features_final = self.trainer._prepare_features(test_data.copy())
