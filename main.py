@@ -3,7 +3,7 @@
 import sys
 import os
 import pandas as pd
-from src.config import MODE, SYMBOL
+from src.config import MODE, SYMBOL, BACKTEST_START_DATE, BACKTEST_END_DATE
 from src.logger import logger
 
 def main():
@@ -39,6 +39,13 @@ def main():
             
         optimizer = WalkForwardOptimizer(full_historical_data)
         optimizer.run()
+
+    elif MODE == 'backtest':
+        logger.info(f"--- MODO: BACKTEST RÁPIDO ---")
+        from src.quick_tester import QuickTester
+        
+        tester = QuickTester()
+        tester.run(start_date_str=BACKTEST_START_DATE, end_date_str=BACKTEST_END_DATE)
 
     elif MODE == 'test' or MODE == 'trade':
         logger.info(f"--- MODO: {MODE.upper()} ---")

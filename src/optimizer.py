@@ -1,3 +1,5 @@
+# src/optimizer.py
+
 import optuna
 import pandas as pd
 import numpy as np
@@ -5,13 +7,14 @@ import json
 import signal
 import os
 import math
-import gc  # Importa o Garbage Collector para gerenciamento de memória
+import gc
 
 from src.model_trainer import ModelTrainer
 from src.backtest import run_backtest
 from src.logger import logger
 from src.config import (
-    WFO_TRAIN_MINUTES, WFO_TEST_MINUTES, WFO_STEP_MINUTES, WFO_STATE_FILE, STRATEGY_PARAMS_FILE
+    WFO_TRAIN_MINUTES, WFO_TEST_MINUTES, WFO_STEP_MINUTES, WFO_STATE_FILE,
+    STRATEGY_PARAMS_FILE, RISK_PER_TRADE_PCT # ATUALIZADO: Importa o risco por trade
 )
 
 class WalkForwardOptimizer:
@@ -65,7 +68,6 @@ class WalkForwardOptimizer:
     def _objective(self, trial, train_data, test_data):
         if self.shutdown_requested: raise optuna.exceptions.TrialPruned()
         
-        # --- ESPAÇO DE BUSCA DE HIPERPARÂMETROS ---
         all_params = {
             'n_estimators': trial.suggest_int('n_estimators', 200, 800),
             'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.2),
@@ -85,25 +87,27 @@ class WalkForwardOptimizer:
             'prediction_confidence': trial.suggest_float('prediction_confidence', 0.52, 0.90)
         }
         
-        # 1. Treina o modelo. A função `train` internamente prepara as features para `train_data`.
         model, scaler = self.trainer.train(train_data.copy(), all_params)
         if model is None:
-            return -2.0  # Retorna Sharpe muito baixo para indicar falha no treino
+            return -2.0
 
-        # ## CORREÇÃO CRÍTICA: PREPARA AS FEATURES PARA OS DADOS DE TESTE ##
-        # Antes de passar para o backtest, as features precisam ser calculadas.
         test_features = self.trainer._prepare_features(test_data.copy())
         if test_features.empty:
             logger.warning("DataFrame de teste ficou vazio após preparação de features. Pulando trial.")
             return -2.0
 
-        # 2. Executa o backtest realista com os dados de teste já com as features.
-        strategy_params = {k: all_params[k] for k in ['profit_threshold', 'stop_loss_threshold', 'prediction_confidence']}
+        # ATUALIZADO: Inclui o risco por trade nos parâmetros da estratégia para o backtest
+        strategy_params = {
+            'profit_threshold': all_params['profit_threshold'],
+            'stop_loss_threshold': all_params['stop_loss_threshold'],
+            'prediction_confidence': all_params['prediction_confidence'],
+            'risk_per_trade_pct': RISK_PER_TRADE_PCT 
+        }
         
         capital, sharpe_ratio = run_backtest(
             model=model,
             scaler=scaler,
-            test_data=test_features,  # Passa o DataFrame com features
+            test_data_with_features=test_features,
             strategy_params=strategy_params,
             feature_names=self.trainer.feature_names
         )
@@ -131,7 +135,6 @@ class WalkForwardOptimizer:
         while start_index + train_size + test_size <= n_total:
             if self.shutdown_requested: break
             
-            # Fatiamento dos dados BRUTOS para o ciclo atual
             train_data = self.full_data.iloc[start_index : start_index + train_size]
             test_data = self.full_data.iloc[start_index + train_size : start_index + train_size + test_size]
 
@@ -159,13 +162,25 @@ class WalkForwardOptimizer:
                 final_model, final_scaler = self.trainer.train(train_data.copy(), best_trial.params)
                 
                 if final_model:
-                    strategy_params = {k: best_trial.params[k] for k in ['profit_threshold', 'stop_loss_threshold', 'prediction_confidence']}
+                    # ATUALIZADO: Garante que os parâmetros finais para o backtest também incluam o risco
+                    strategy_params = {
+                        'profit_threshold': best_trial.params['profit_threshold'],
+                        'stop_loss_threshold': best_trial.params['stop_loss_threshold'],
+                        'prediction_confidence': best_trial.params['prediction_confidence'],
+                        'risk_per_trade_pct': RISK_PER_TRADE_PCT
+                    }
                     best_strategy_params = strategy_params.copy()
                     
                     logger.info("  - Executando backtest final no período de teste...")
-                    # Prepara as features para o backtest final, garantindo consistência
                     test_features_final = self.trainer._prepare_features(test_data.copy())
-                    capital, sharpe = run_backtest(final_model, final_scaler, test_features_final, strategy_params, self.trainer.feature_names)
+                    
+                    capital, sharpe = run_backtest(
+                        model=final_model, 
+                        scaler=final_scaler, 
+                        test_data_with_features=test_features_final, 
+                        strategy_params=strategy_params, 
+                        feature_names=self.trainer.feature_names
+                    )
                     
                     result_pct = (capital - 100) / 100 if capital > 0 else 0
                     all_results.append({'period': f"{test_data.index.min():%Y-%m-%d}_a_{test_data.index.max():%Y-%m-%d}", 'capital': capital, 'sharpe': sharpe})
@@ -185,8 +200,7 @@ class WalkForwardOptimizer:
             start_index += step_size
             cycle += 1
             self._save_wfo_state(cycle, start_index, all_results, cumulative_capital)
-
-            # ## OTIMIZAÇÃO DE MEMÓRIA: Limpa os objetos do ciclo atual ##
+            
             logger.debug(f"Limpando memória do ciclo #{cycle-1}...")
             del train_data, test_data, study, best_trial
             gc.collect()
@@ -201,6 +215,7 @@ class WalkForwardOptimizer:
         if final_model and best_strategy_params:
             logger.info("Salvando o modelo, normalizador e parâmetros de estratégia do último ciclo bem-sucedido...")
             self.trainer.save_model(final_model, final_scaler)
+            # Salva todos os parâmetros, incluindo o de risco, para consistência.
             with open(STRATEGY_PARAMS_FILE, 'w') as f:
                 json.dump(best_strategy_params, f, indent=4)
             logger.info("✅ Modelo e parâmetros da estratégia salvos com sucesso.")

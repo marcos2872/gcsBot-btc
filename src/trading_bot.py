@@ -39,11 +39,13 @@ class PortfolioManager:
 
     def sync_with_live_balance(self):
         """Sincroniza o estado do portfólio com o saldo REAL da conta na Binance."""
+        if not self.client:
+            logger.error("Cliente Binance indisponível. Não é possível sincronizar o portfólio.")
+            return False
         try:
             logger.info("Sincronizando com o saldo real da conta Binance...")
-            # É mais seguro pegar o preço atual por uma chamada de API separada
-            data_manager = DataManager()
-            current_price = data_manager.client.get_symbol_ticker(symbol=SYMBOL)['price']
+            # ATUALIZADO: Reutiliza o cliente existente em vez de criar um novo DataManager
+            current_price = self.client.get_symbol_ticker(symbol=SYMBOL)['price']
             current_price = float(current_price)
             
             usdt_balance = float(self.client.get_asset_balance(asset='USDT')['free'])
@@ -99,7 +101,6 @@ class PortfolioManager:
 
 class TradingBot:
     def __init__(self):
-        # A inicialização do cliente da Binance é gerenciada pelo DataManager
         self.data_manager = DataManager()
         self.client = self.data_manager.client
         self.portfolio = PortfolioManager(self.client)
@@ -180,17 +181,13 @@ class TradingBot:
     def _prepare_prediction_data(self):
         """Prepara os dados mais recentes para que o modelo possa fazer uma predição."""
         try:
-            # ## CORREÇÃO CRÍTICA ##
-            # Usamos a função principal do DataManager para garantir que TODOS os dados (crypto + macro)
-            # sejam carregados e atualizados a partir de seus caches.
-            df_combined = self.data_manager.update_and_load_data()
+            # Passa os argumentos SYMBOL e '1m' para a função de carregamento de dados
+            df_combined = self.data_manager.update_and_load_data(SYMBOL, '1m')
             
-            # Garante que temos dados suficientes para calcular todos os indicadores
             if df_combined.empty or len(df_combined) < 200:
                  logger.warning(f"Dados insuficientes para predição ({len(df_combined)} linhas). Aguardando...")
                  return None, None
 
-            # Usa a mesma classe ModelTrainer para garantir consistência na criação de features
             trainer = ModelTrainer()
             df_features = trainer._prepare_features(df_combined.copy())
             
@@ -198,7 +195,6 @@ class TradingBot:
                 logger.warning("DataFrame de features ficou vazio após o preparo. Não é possível prever.")
                 return None, None
             
-            # Pega a última linha de features disponível (que corresponde à vela mais recente)
             last_feature_row = df_features.iloc[[-1]]
             current_price = df_combined['close'].iloc[-1]
             
@@ -210,21 +206,18 @@ class TradingBot:
     def execute_trade(self, side, quantity):
         """Envia uma ordem de mercado para a exchange e retorna o resultado real."""
         try:
-            # Formata a quantidade para a precisão correta do BTC
             formatted_quantity = "{:.6f}".format(quantity)
             logger.info(f"Enviando ordem de mercado: Lado={side}, Quantidade={formatted_quantity}")
             
             order = self.client.create_order(symbol=SYMBOL, side=side, type=Client.ORDER_TYPE_MARKET, quantity=formatted_quantity)
             logger.info(f"ORDEM EXECUTADA: {order}")
             
-            # Usa os 'fills' para obter o preço médio real da execução, que é mais preciso
             fills = order.get('fills', [])
             if fills:
                 avg_price = sum(float(f['price']) * float(f['qty']) for f in fills) / sum(float(f['qty']) for f in fills)
                 executed_qty = sum(float(f['qty']) for f in fills)
                 return order, avg_price, executed_qty
             
-            # Fallback caso 'fills' não esteja presente (menos comum)
             return order, float(order.get('price', 0)), float(order.get('executedQty', 0))
         except BinanceAPIException as e:
             logger.error(f"ERRO DE API AO EXECUTAR ORDEM: {e}")
@@ -272,7 +265,7 @@ class TradingBot:
                                 self._log_trade("SELL", sell_price, executed_qty, "Take-Profit/Stop-Loss", pnl_usdt, pnl_percent)
                                 self.in_trade_position = False
                                 self._save_state()
-                else: # Se não está em posição, avalia a entrada
+                else: 
                     scaled_features = self.scaler.transform(features_df)
                     buy_confidence = self.model.predict_proba(scaled_features)[0][1]
                     logger.info(f"Preço Atual: ${current_price:,.2f} | Confiança de Compra do Modelo: {buy_confidence:.2%}")

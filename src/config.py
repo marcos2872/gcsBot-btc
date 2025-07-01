@@ -1,7 +1,8 @@
-# src/config.py
+# src/config.py (ATUALIZADO)
 
 from dotenv import load_dotenv
 import os
+import sys # Importa o sys para poder encerrar o programa
 from src.logger import logger
 
 # Carrega as variáveis do arquivo .env para o ambiente
@@ -14,7 +15,6 @@ def get_config_var(var_name, default_value=None):
     """
     value = os.getenv(var_name, default_value)
     if isinstance(value, str):
-        # Remove espaços no início/fim e remove aspas
         return value.strip().strip("'\"")
     return value
 
@@ -22,6 +22,15 @@ def get_config_var(var_name, default_value=None):
 MODE = get_config_var("MODE", "optimize").lower()
 FORCE_OFFLINE_MODE = get_config_var("FORCE_OFFLINE_MODE", "False").lower() == 'true'
 
+# --- VALIDAÇÃO CRÍTICA DO MODO OFFLINE (NOVA SEÇÃO) ---
+if FORCE_OFFLINE_MODE and MODE in ['test', 'trade']:
+    error_message = f"CONFIGURAÇÃO INVÁLIDA: O bot não pode rodar em modo '{MODE.upper()}' quando 'FORCE_OFFLINE_MODE' está 'True'."
+    logger.error("="*80)
+    logger.error(error_message)
+    logger.error("Trading real ou em testnet requer uma conexão ativa com a internet.")
+    logger.error("Por favor, ajuste seu arquivo .env e tente novamente.")
+    logger.error("="*80)
+    sys.exit(1) # Encerra o programa imediatamente com um código de erro
 
 # --- CONFIGURAÇÕES DA BINANCE ---
 SYMBOL = get_config_var("SYMBOL", "BTCUSDT").upper()
@@ -36,17 +45,8 @@ if MODE in ['test', 'trade'] and not FORCE_OFFLINE_MODE and (not API_KEY or not 
     raise ValueError(f"Para MODE='{MODE}' em modo online, as chaves da API devem ser configuradas no .env")
 
 # --- ESTRATÉGIA DE GESTÃO DE PORTFÓLIO E RISCO ---
-# O MÁXIMO de capital em USDT que este bot tem permissão para gerenciar.
-# O bot usará o menor valor entre este e o seu saldo real na Binance.
-# Defina um valor alto (ex: 1000000) se quiser que ele use sempre 100% do seu saldo.
 MAX_USDT_ALLOCATION = float(get_config_var("MAX_USDT_ALLOCATION", 1000.0))
-
-# Percentual do capital que será usado para comprar e manter BTC como holding de longo prazo.
-# O bot NÃO tocará nesta parte do BTC para fazer trades. Ex: 0.50 = 50%
 LONG_TERM_HOLD_PCT = float(get_config_var("LONG_TERM_HOLD_PCT", 0.50))
-
-# Do capital de TRADING restante, qual a % de risco por operação? Este é o seu principal controle.
-# Ex: 0.02 = 2% do capital de trading será arriscado em cada nova operação.
 RISK_PER_TRADE_PCT = float(get_config_var("RISK_PER_TRADE_PCT", 0.02))
 
 # --- CONFIGURAÇÕES DE ARQUIVOS ---
@@ -57,6 +57,8 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 
 KAGGLE_BOOTSTRAP_FILE = os.path.join(DATA_DIR, "kaggle_btc_1m_bootstrap.csv")
 HISTORICAL_DATA_FILE = os.path.join(DATA_DIR, f"full_historical_{SYMBOL}.csv")
+COMBINED_DATA_CACHE_FILE = os.path.join(DATA_DIR, "combined_data_cache.csv")
+
 MODEL_FILE = os.path.join(DATA_DIR, "trading_model.pkl")
 SCALER_FILE = os.path.join(DATA_DIR, "scaler.pkl")
 TRADES_LOG_FILE = os.path.join(DATA_DIR, "trades_log.csv")
@@ -66,5 +68,11 @@ STRATEGY_PARAMS_FILE = os.path.join(DATA_DIR, "strategy_params.json")
 
 # --- PARÂMETROS PARA A OTIMIZAÇÃO WALK-FORWARD ---
 WFO_TRAIN_MINUTES = int(get_config_var("WFO_TRAIN_MINUTES", 43200)) # ~30 dias
-WFO_TEST_MINUTES = int(get_config_var("WFO_TEST_MINUTES", 10080))  # ~7 dias
-WFO_STEP_MINUTES = int(get_config_var("WFO_STEP_MINUTES", 10080))  # ~7 dias
+# ATUALIZADO: Período de teste de 14 dias para uma validação mais robusta
+WFO_TEST_MINUTES = int(get_config_var("WFO_TEST_MINUTES", 20160))  # ~14 dias
+# ATUALIZADO: Passo de 14 dias para equilibrar velocidade e adaptabilidade
+WFO_STEP_MINUTES = int(get_config_var("WFO_STEP_MINUTES", 20160))  # ~14 dias
+
+# --- NOVOS PARÂMETROS PARA O MODO DE BACKTEST RÁPIDO ---
+BACKTEST_START_DATE = get_config_var("BACKTEST_START_DATE", "2024-01-01")
+BACKTEST_END_DATE = get_config_var("BACKTEST_END_DATE", "2025-03-31")

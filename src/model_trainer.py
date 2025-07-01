@@ -15,12 +15,12 @@ from ta.momentum import StochasticOscillator, RSIIndicator
 
 @jit(nopython=True)
 def create_labels_triple_barrier(
-    closes: np.ndarray, 
-    highs: np.ndarray, 
-    lows: np.ndarray, 
-    atr: np.ndarray, 
-    future_periods: int, 
-    profit_multiplier: float, 
+    closes: np.ndarray,
+    highs: np.ndarray,
+    lows: np.ndarray,
+    atr: np.ndarray,
+    future_periods: int,
+    profit_multiplier: float,
     stop_multiplier: float
 ) -> np.ndarray:
     """
@@ -35,7 +35,7 @@ def create_labels_triple_barrier(
 
         profit_barrier = closes[i] + (atr[i] * profit_multiplier)
         stop_barrier = closes[i] - (atr[i] * stop_multiplier)
-        
+
         target_hit = False
         for j in range(1, future_periods + 1):
             future_high, future_low = highs[i + j], lows[i + j]
@@ -47,7 +47,7 @@ def create_labels_triple_barrier(
                 labels[i] = 2
                 target_hit = True
                 break
-        
+
         if not target_hit:
             labels[i] = 1 if closes[i + future_periods] > closes[i] else 2
 
@@ -60,13 +60,14 @@ class ModelTrainer:
     """
     def __init__(self):
         # Lista definitiva de features. A "mente" completa do bot.
+        # ATUALIZADO: Garante que os nomes das features macro sejam consistentes.
         self.feature_names = [
             'sma_7', 'sma_25', 'rsi', 'price_change_1m', 'price_change_5m',
             'bb_width', 'bb_pband',
             'atr', 'macd_diff', 'stoch_osc',
             'adx', 'adx_pos', 'adx_neg',
             'dxy_close_change', 'vix_close_change',
-            'gold_close_change', 'us10y_close_change' # Corrigido para tnx -> us10y para consistência
+            'gold_close_change', 'tnx_close_change'
         ]
 
     def _prepare_features(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -75,7 +76,7 @@ class ModelTrainer:
         com lógica robusta para evitar NaNs e elimina o look-ahead bias.
         """
         epsilon = 1e-10
-        
+
         # --- Volatilidade e Bandas de Bollinger ---
         df['atr'] = AverageTrueRange(high=df['high'], low=df['low'], close=df['close'], window=14).average_true_range()
         bb = BollingerBands(close=df['close'], window=20, window_dev=2)
@@ -96,32 +97,28 @@ class ModelTrainer:
         df['stoch_osc'] = StochasticOscillator(high=df['high'], low=df['low'], close=df['close']).stoch()
 
         # --- Features Macroeconômicas (Variação na última hora) ---
+        # ATUALIZADO: As chaves do dicionário agora correspondem exatamente às colunas
+        # geradas pelo novo data_manager.py
         macro_map = {
-            'dx_close': 'dxy_close_change',
+            'dxy_close': 'dxy_close_change',
             'vix_close': 'vix_close_change',
-            'gc_close': 'gold_close_change',
-            'us10y_close': 'us10y_close_change' # Corrigido para tnx -> us10y para consistência
+            'gold_close': 'gold_close_change',
+            'tnx_close': 'tnx_close_change'
         }
         for col_in, col_out in macro_map.items():
             if col_in in df.columns:
-                # ## AJUSTE CRÍTICO ##
-                # Removemos o .fillna(0). Os NaNs gerados no início do dataset
-                # serão tratados de forma limpa pelo df.dropna() no final da função.
-                # Isso impede que o modelo aprenda com dados artificiais ("variação de 0%").
                 df[col_out] = df[col_in].pct_change(60)
             else:
                 df[col_out] = 0 # Garante que a coluna exista mesmo que a busca de dados falhe
-        
+
         # --- CORREÇÃO CRÍTICA: ELIMINAÇÃO DO LOOK-AHEAD BIAS ---
         # Desloca os dados em 1 período para garantir que o modelo não veja dados do futuro.
         df[self.feature_names] = df[self.feature_names].shift(1)
-        
+
         # --- Limpeza final de dados ---
-        # Remove quaisquer valores infinitos que possam ter sido gerados
         df.replace([np.inf, -np.inf], np.nan, inplace=True)
-        # Remove todas as linhas que contêm qualquer valor NaN, garantindo um dataset 100% limpo para o treino
         df.dropna(inplace=True)
-        
+
         return df
 
     def train(self, data: pd.DataFrame, all_params: dict):
@@ -132,7 +129,7 @@ class ModelTrainer:
 
         logger.debug("Iniciando preparação de features para o treinamento...")
         df_full = self._prepare_features(data.copy())
-        
+
         if df_full.empty:
             logger.warning("DataFrame ficou vazio após a preparação de features. Pulando trial.")
             return None, None
@@ -140,27 +137,26 @@ class ModelTrainer:
         future_periods = all_params.get('future_periods', 30)
         profit_mult = all_params.get('profit_mult', 2.0)
         stop_mult = all_params.get('stop_mult', 2.0)
-        
+
         logger.debug(f"Gerando labels com: future_periods={future_periods}, profit_mult={profit_mult}, stop_mult={stop_mult}")
-        
+
         labels_np = create_labels_triple_barrier(
             closes=df_full['close'].to_numpy(), highs=df_full['high'].to_numpy(),
             lows=df_full['low'].to_numpy(), atr=df_full['atr'].to_numpy(),
             future_periods=future_periods, profit_multiplier=profit_mult, stop_multiplier=stop_mult
         )
-        
+
         y = pd.Series(labels_np, index=df_full.index, name="label")
         X = df_full[self.feature_names]
-        
-        # Valida se há exemplos suficientes de ambas as classes (compra e venda)
+
         if y.value_counts().get(1, 0) < 20 or y.value_counts().get(2, 0) < 20:
             logger.warning(f"Não há exemplos suficientes de compra/venda para um treino confiável. Counts: {y.value_counts().to_dict()}")
             return None, None
-            
+
         logger.debug("Normalizando features e treinando o modelo LightGBM...")
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
-        
+
         model_params = {
             'n_estimators': all_params.get('n_estimators', 200),
             'learning_rate': all_params.get('learning_rate', 0.05),
@@ -174,10 +170,9 @@ class ModelTrainer:
             'lambda_l2': all_params.get('lambda_l2', 0.1),
         }
 
-        # class_weight='balanced' é crucial para dados financeiros desbalanceados
         model = LGBMClassifier(**model_params, random_state=42, n_jobs=-1, class_weight='balanced', verbosity=-1)
         model.fit(X_scaled, y)
-        
+
         logger.debug("Treinamento do modelo concluído com sucesso.")
         return model, scaler
 

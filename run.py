@@ -1,7 +1,10 @@
+# run.py (ATUALIZADO)
+
 import subprocess
 import os
 import sys
 import shutil
+from dotenv import load_dotenv
 
 # --- Configuração do Projeto ---
 DOCKER_IMAGE_NAME = "gcsbot"
@@ -21,7 +24,6 @@ def print_color(text, color="green"):
 def run_command(command, shell=True, capture_output=False, check=False):
     """Executa um comando no shell e retorna o resultado, com opção de parar em caso de erro."""
     print_color(f"\n> Executando: {command}", "blue")
-    # Usar 'utf-8' para evitar problemas de encoding em diferentes sistemas
     result = subprocess.run(command, shell=shell, capture_output=capture_output, text=True, encoding='utf-8')
     if check and result.returncode != 0:
         print_color(f"Erro ao executar o comando: {command}", "red")
@@ -53,6 +55,24 @@ def check_env_file():
         print_color("IMPORTANTE: Abra o arquivo .env e preencha suas chaves de API e configurações de portfólio.", "red")
         sys.exit(1)
     print_color("Arquivo .env encontrado.", "green")
+    
+def check_env_configuration(mode_to_run):
+    """
+    NOVA FUNÇÃO: Lê o .env e valida a combinação de modo de operação e modo offline.
+    """
+    print_color("Validando a configuração do ambiente...", "yellow")
+    load_dotenv(dotenv_path=ENV_FILE)
+    is_offline = os.getenv("FORCE_OFFLINE_MODE", "False").lower() == 'true'
+
+    if is_offline and mode_to_run in ['test', 'trade']:
+        print_color("="*60, "red")
+        print_color("ERRO DE CONFIGURAÇÃO", "red")
+        print_color(f"Você está tentando rodar em modo '{mode_to_run.upper()}' com 'FORCE_OFFLINE_MODE=True'.", "red")
+        print_color("Um bot de trading não pode operar sem conexão com a internet.", "red")
+        print_color("Ação: Mude 'FORCE_OFFLINE_MODE' para 'False' no arquivo .env ou use o modo 'optimize'.", "red")
+        print_color("="*60, "red")
+        sys.exit(1)
+    print_color("Configuração do ambiente é válida.", "green")
 
 def check_data_files():
     """Verifica se os arquivos de dados essenciais existem."""
@@ -82,28 +102,26 @@ def docker_build():
 def start_bot(mode):
     """Inicia o bot usando Docker no modo especificado."""
     check_docker_running()
+    # ATUALIZADO: Chama a nova função de validação antes de qualquer outra coisa
+    check_env_configuration(mode)
+    
     container_name = f"gcsbot-{mode}"
     print_color(f"--- Iniciando Bot em Modo '{mode.upper()}' no container '{container_name}' ---", "blue")
     os.makedirs("data", exist_ok=True)
     os.makedirs("logs", exist_ok=True)
     
-    # Prepara os caminhos dos volumes de forma compatível com múltiplos SO
     data_volume = f"-v \"{os.path.abspath('data')}:/app/data\""
     logs_volume = f"-v \"{os.path.abspath('logs')}:/app/logs\""
     
-    # Define os parâmetros de execução com base no modo
     if mode in ['test', 'trade']:
-        # Modos de serviço contínuo: rodam em segundo plano e reiniciam sempre
         run_params = "-d --restart always"
     elif mode == 'optimize':
-        # Modo de tarefa: roda em segundo plano, mas não reinicia automaticamente.
-        # O --rm é removido para que possamos ver os logs depois.
         run_params = "-d" 
+    elif mode == 'backtest':
+        run_params = "--rm -it"
     else:
-        # Modo padrão para qualquer outro comando (se houver): roda em primeiro plano e remove ao sair
         run_params = "--rm"
 
-    # Garante que não haja um container antigo com o mesmo nome
     print_color(f"Removendo container antigo '{container_name}' se existir...", "yellow")
     run_command(f"docker rm -f {container_name}", capture_output=True)
 
@@ -111,7 +129,6 @@ def start_bot(mode):
     
     run_command(command, check=True)
     
-    # Mensagem de sucesso unificada para todos os modos que rodam em segundo plano
     if mode in ['test', 'trade', 'optimize']:
         print_color(f"Bot no modo '{mode}' iniciado em segundo plano. Para ver os logs, use:", "green")
         print_color(f"python run.py logs", "blue")
@@ -119,7 +136,7 @@ def start_bot(mode):
         print_color("Processo iniciado. Você pode acompanhar o progresso nesta janela.", "yellow")
 
 def stop_bot():
-    """Para e remove todos os containers do bot (funciona no Windows, Linux e macOS)."""
+    """Para e remove todos os containers do bot."""
     check_docker_running()
     print_color("--- Parando e Removendo Containers do Bot ---", "yellow")
     result = run_command("docker ps -a --filter \"name=gcsbot-\" --format \"{{.Names}}\"", capture_output=True)
@@ -138,29 +155,24 @@ def stop_bot():
     print_color("Containers parados e removidos com sucesso.", "green")
 
 def show_logs():
-    """Mostra os logs de um container do bot que estiver ativo (test, trade ou optimize)."""
+    """Mostra os logs de um container do bot que estiver ativo."""
     check_docker_running()
     print_color("--- Procurando por containers do bot ativos ---", "yellow")
-
-    # Lista de modos para procurar, em ordem de prioridade
     modes_to_check = ["optimize", "test", "trade"]
 
     for mode in modes_to_check:
         container_name = f"gcsbot-{mode}"
-        # Verifica se o container com esse nome está em execução
         result = run_command(f"docker ps -q --filter \"name={container_name}\"", capture_output=True)
         
         if result.stdout.strip():
             print_color(f"Anexando aos logs do container '{container_name}'. Pressione CTRL+C para sair.", "green")
             try:
-                # Usa subprocess.run para que o CTRL+C seja capturado corretamente
                 subprocess.run(f"docker logs -f {container_name}", shell=True)
             except KeyboardInterrupt:
                 print_color("\n\nDesanexado dos logs.", "yellow")
             except subprocess.CalledProcessError:
-                 # Ocorre se o container parar enquanto os logs estão sendo vistos
                  print_color(f"\nO container '{container_name}' parou de executar.", "yellow")
-            return # Sai da função após encontrar e mostrar os logs
+            return
 
     print_color("Nenhum container do bot (gcsbot-optimize, gcsbot-test ou gcsbot-trade) está em execução.", "red")
 
@@ -171,6 +183,7 @@ def main():
         print("  setup      - Instala dependências e verifica o ambiente.")
         print("  build      - Constrói a imagem Docker do bot.")
         print("  optimize   - Roda a otimização em segundo plano via Docker.")
+        print("  backtest   - Roda um backtest rápido em um período específico com o último modelo otimizado.")
         print("  test       - Roda o bot em modo TEST na Testnet 24/7 via Docker.")
         print("  trade      - Roda o bot em modo TRADE na conta real 24/7 via Docker.")
         print("  stop       - Para e remove todos os containers do bot.")
@@ -182,6 +195,7 @@ def main():
     if command == "setup": initial_setup()
     elif command == "build": docker_build()
     elif command == "optimize": start_bot("optimize")
+    elif command == "backtest": start_bot("backtest")
     elif command == "test": start_bot("test")
     elif command == "trade": start_bot("trade")
     elif command == "stop": stop_bot()
