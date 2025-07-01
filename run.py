@@ -1,5 +1,3 @@
-# run.py (ATUALIZADO)
-
 import subprocess
 import os
 import sys

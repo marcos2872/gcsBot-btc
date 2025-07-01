@@ -1,4 +1,4 @@
-# src/optimizer.py
+# src/optimizer.py (AJUSTADO PARA SALVAR A CADA CICLO)
 
 import optuna
 import pandas as pd
@@ -14,7 +14,7 @@ from src.backtest import run_backtest
 from src.logger import logger
 from src.config import (
     WFO_TRAIN_MINUTES, WFO_TEST_MINUTES, WFO_STEP_MINUTES, WFO_STATE_FILE,
-    STRATEGY_PARAMS_FILE, RISK_PER_TRADE_PCT # ATUALIZADO: Importa o risco por trade
+    STRATEGY_PARAMS_FILE, RISK_PER_TRADE_PCT, MODEL_FILE, SCALER_FILE
 )
 
 class WalkForwardOptimizer:
@@ -96,7 +96,6 @@ class WalkForwardOptimizer:
             logger.warning("DataFrame de teste ficou vazio após preparação de features. Pulando trial.")
             return -2.0
 
-        # ATUALIZADO: Inclui o risco por trade nos parâmetros da estratégia para o backtest
         strategy_params = {
             'profit_threshold': all_params['profit_threshold'],
             'stop_loss_threshold': all_params['stop_loss_threshold'],
@@ -130,7 +129,6 @@ class WalkForwardOptimizer:
         logger.info(f"Otimização será executada em aproximadamente {total_cycles} ciclos.")
 
         start_index, cycle, all_results, cumulative_capital = self._load_wfo_state()
-        final_model, final_scaler, best_strategy_params = None, None, None
 
         while start_index + train_size + test_size <= n_total:
             if self.shutdown_requested: break
@@ -162,14 +160,19 @@ class WalkForwardOptimizer:
                 final_model, final_scaler = self.trainer.train(train_data.copy(), best_trial.params)
                 
                 if final_model:
-                    # ATUALIZADO: Garante que os parâmetros finais para o backtest também incluam o risco
                     strategy_params = {
                         'profit_threshold': best_trial.params['profit_threshold'],
                         'stop_loss_threshold': best_trial.params['stop_loss_threshold'],
                         'prediction_confidence': best_trial.params['prediction_confidence'],
                         'risk_per_trade_pct': RISK_PER_TRADE_PCT
                     }
-                    best_strategy_params = strategy_params.copy()
+                    
+                    # --- ATUALIZADO: Lógica de salvamento movida para DENTRO do loop ---
+                    logger.info("  - ✅ Modelo promissor encontrado! Salvando modelo e parâmetros deste ciclo...")
+                    self.trainer.save_model(final_model, final_scaler)
+                    with open(STRATEGY_PARAMS_FILE, 'w') as f:
+                        json.dump(strategy_params, f, indent=4)
+                    # --- Fim da atualização ---
                     
                     logger.info("  - Executando backtest final no período de teste...")
                     test_features_final = self.trainer._prepare_features(test_data.copy())
@@ -211,13 +214,3 @@ class WalkForwardOptimizer:
         
         logger.info(f"--- CAPITAL FINAL SIMULADO ACUMULADO: ${cumulative_capital:,.2f} ---")
         logger.info("="*80)
-
-        if final_model and best_strategy_params:
-            logger.info("Salvando o modelo, normalizador e parâmetros de estratégia do último ciclo bem-sucedido...")
-            self.trainer.save_model(final_model, final_scaler)
-            # Salva todos os parâmetros, incluindo o de risco, para consistência.
-            with open(STRATEGY_PARAMS_FILE, 'w') as f:
-                json.dump(best_strategy_params, f, indent=4)
-            logger.info("✅ Modelo e parâmetros da estratégia salvos com sucesso.")
-        else:
-            logger.warning("Nenhum modelo foi treinado com sucesso no último ciclo, então nada foi salvo.")
