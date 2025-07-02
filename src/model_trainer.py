@@ -1,4 +1,4 @@
-# src/model_trainer.py (VERSÃO HÍBRIDA FINAL)
+# src/model_trainer.py (VERSÃO FINAL COM REGIMES E 3 CLASSES DE LABEL)
 
 import pandas as pd
 import numpy as np
@@ -24,57 +24,62 @@ def create_labels_triple_barrier(
     stop_multiplier: float
 ) -> np.ndarray:
     """
-    Implementação profissional do Método da Barreira Tripla para rotulagem.
+    Implementação da Barreira Tripla com 3 classes de rótulos:
+    - 1: Compra (barreira de lucro atingida)
+    - 2: Venda (barreira de stop atingida)
+    - 0: Neutro (tempo esgotado sem tocar nas barreiras)
     """
     n = len(closes)
-    labels = np.zeros(n, dtype=np.int64)
+    labels = np.zeros(n, dtype=np.int64) # O padrão agora é 0 (Neutro)
     for i in range(n - future_periods):
         if atr[i] <= 1e-10: continue
+        
         profit_barrier = closes[i] + (atr[i] * profit_multiplier)
         stop_barrier = closes[i] - (atr[i] * stop_multiplier)
-        target_hit = False
+        
         for j in range(1, future_periods + 1):
             future_high, future_low = highs[i + j], lows[i + j]
+            
             if future_high >= profit_barrier:
-                labels[i] = 1; target_hit = True; break
+                labels[i] = 1 # Lucro
+                break # Sai do loop interno, pois o resultado foi definido
+            
             if future_low <= stop_barrier:
-                labels[i] = 2; target_hit = True; break
-        if not target_hit:
-            labels[i] = 1 if closes[i + future_periods] > closes[i] else 2
+                labels[i] = 2 # Prejuízo
+                break # Sai do loop interno, pois o resultado foi definido
+                
+        # Se o loop terminar sem atingir lucro ou prejuízo, o label permanece 0 (Neutro).
+        # A lógica antiga que forçava uma decisão foi removida.
+        
     return labels
 
 class ModelTrainer:
     def __init__(self):
-        # Lista de features combinando o melhor das duas abordagens
+        # A lista de features com os regimes está perfeita, mantemos ela.
         self.feature_names = [
             'sma_7', 'sma_25', 'rsi', 'price_change_1m', 'price_change_5m',
             'bb_width', 'bb_pband',
             'atr', 'macd_diff', 'stoch_osc',
-            'adx', 'adx_pos', 'adx_neg',      # Features de força da tendência
-            'regime_tendencia', 'regime_volatilidade', # Novas features de contexto
-            'dxy_close_change', 'vix_close_change',   # Features macro de variação (da versão antiga)
+            'adx', 'adx_pos', 'adx_neg',
+            'regime_tendencia', 'regime_volatilidade',
+            'dxy_close_change', 'vix_close_change',
             'gold_close_change', 'tnx_close_change'
         ]
 
     def _prepare_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Calcula um conjunto robusto de features, garantindo a ausência de look-ahead bias.
-        """
+        # Sua função _prepare_features está excelente e não precisa de alterações.
         logger.debug("Preparando features com a estratégia híbrida...")
         epsilon = 1e-10
         
-        # --- Volatilidade e Bandas de Bollinger ---
         df['atr'] = AverageTrueRange(high=df['high'], low=df['low'], close=df['close'], window=14).average_true_range()
         bb = BollingerBands(close=df['close'], window=20, window_dev=2)
         df['bb_width'] = (bb.bollinger_hband() - bb.bollinger_lband()) / (bb.bollinger_mavg() + epsilon)
         df['bb_pband'] = bb.bollinger_pband()
 
-        # --- Tendência ---
         df['sma_7'] = df['close'].rolling(window=7).mean()
         df['sma_25'] = df['close'].rolling(window=25).mean()
         df['macd_diff'] = MACD(close=df['close']).macd_diff()
         
-        # --- Força da Tendência e Regime de Mercado ---
         adx_indicator = ADXIndicator(high=df['high'], low=df['low'], close=df['close'], window=14)
         df['adx'], df['adx_pos'], df['adx_neg'] = adx_indicator.adx(), adx_indicator.adx_pos(), adx_indicator.adx_neg()
         df['sma_200'] = df['close'].rolling(window=200).mean()
@@ -82,13 +87,11 @@ class ModelTrainer:
         df['atr_mean_50'] = df['atr'].rolling(window=50).mean()
         df['regime_volatilidade'] = (df['atr'] > df['atr_mean_50']).astype(int)
 
-        # --- Momento ---
         df['price_change_1m'] = df['close'].pct_change(1)
         df['price_change_5m'] = df['close'].pct_change(5)
         df['rsi'] = RSIIndicator(close=df['close'], window=14).rsi()
         df['stoch_osc'] = StochasticOscillator(high=df['high'], low=df['low'], close=df['close']).stoch()
 
-        # --- Features Macroeconômicas (Variação Percentual na Última Hora) ---
         macro_map = {
             'dxy_close': 'dxy_close_change', 'vix_close': 'vix_close_change',
             'gold_close': 'gold_close_change', 'tnx_close': 'tnx_close_change'
@@ -99,50 +102,58 @@ class ModelTrainer:
             else:
                 df[col_out] = 0
         
-        # --- CORREÇÃO CRÍTICA: GARANTIA CONTRA LOOK-AHEAD BIAS ---
         df[self.feature_names] = df[self.feature_names].shift(1)
-        
         df.replace([np.inf, -np.inf], np.nan, inplace=True)
         df.dropna(inplace=True)
-        
         return df
 
     def train(self, data: pd.DataFrame, all_params: dict):
+        """Prepara os dados, treina e retorna o modelo e o normalizador."""
         if len(data) < 500:
-            logger.warning(f"Dados insuficientes para treino ({len(data)}). Pulando."); return None, None
+            logger.warning(f"Dados insuficientes para treino ({len(data)} registros). Pulando.")
+            return None, None
 
+        logger.debug("Iniciando preparação de features para o treinamento...")
         df_full = self._prepare_features(data.copy())
-        
+
         if df_full.empty:
-            logger.warning("DataFrame vazio após features. Pulando."); return None, None
+            logger.warning("DataFrame ficou vazio após a preparação de features. Pulando trial.")
+            return None, None
 
         future_periods = all_params.get('future_periods', 30)
         profit_mult = all_params.get('profit_mult', 2.0)
         stop_mult = all_params.get('stop_mult', 2.0)
-        
+
+        logger.debug(f"Gerando labels com: future_periods={future_periods}, profit_mult={profit_mult}, stop_mult={stop_mult}")
+
         labels_np = create_labels_triple_barrier(
             closes=df_full['close'].to_numpy(), highs=df_full['high'].to_numpy(),
             lows=df_full['low'].to_numpy(), atr=df_full['atr'].to_numpy(),
             future_periods=future_periods, profit_multiplier=profit_mult, stop_multiplier=stop_mult
         )
-        
+
         y = pd.Series(labels_np, index=df_full.index, name="label")
         X = df_full[self.feature_names]
+
+        logger.info(f"Distribuição dos labels no treino: \n{y.value_counts(normalize=True)}")
         
-        if y.value_counts().get(1, 0) < 20 or y.value_counts().get(2, 0) < 20:
-            logger.warning(f"Não há exemplos suficientes de compra/venda. Counts: {y.value_counts().to_dict()}"); return None, None
-            
+        # Agora, a verificação precisa garantir que temos exemplos de todas as classes, especialmente 1 e 2.
+        counts = y.value_counts()
+        if counts.get(1, 0) < 20 or counts.get(2, 0) < 20:
+            logger.warning(f"Não há exemplos suficientes de compra(1)/venda(2) para um treino confiável. Counts: {counts.to_dict()}")
+            return None, None
+
+        logger.debug("Normalizando features e treinando o modelo LightGBM...")
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
-        
-        model_params = {k: v for k, v in all_params.items() if k not in [
-            'future_periods', 'profit_mult', 'stop_mult', 
-            'profit_threshold', 'stop_loss_threshold', 'prediction_confidence'
-        ]}
 
+        model_params = all_params # Passa todos os parâmetros otimizáveis para o modelo
+        
+        # O LightGBM lida nativamente com classificação multiclasse. Nenhuma mudança necessária aqui.
         model = LGBMClassifier(**model_params, random_state=42, n_jobs=-1, class_weight='balanced', verbosity=-1)
         model.fit(X_scaled, y)
-        
+
+        logger.debug("Treinamento do modelo concluído com sucesso.")
         return model, scaler
 
     def save_model(self, model, scaler):

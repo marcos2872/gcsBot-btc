@@ -1,121 +1,115 @@
-# 📈 gcsBot - Bot de Trading para BTC/USDT com Machine Learning
+# 📈 gcsBot - Framework de Trading Quantitativo para BTC/USDT
 
-![Python](https://img.shields.io/badge/Python-3.12-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg) ![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)
+![Python](https://img.shields.io/badge/Python-3.11+-blue.svg) ![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker) ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-Um bot de trading algorítmico de nível profissional para o par BTC/USDT na Binance, que utiliza técnicas avançadas de Machine Learning e gestão de portfólio dinâmica para otimizar estratégias e operar de forma autônoma.
+Um framework de ponta para pesquisa, validação e execução de estratégias de trading algorítmico no par BTC/USDT. Este projeto vai além de um simples bot, oferecendo um pipeline completo de Machine Learning, desde a otimização de estratégias com dados históricos até a operação autônoma e adaptativa na Binance.
 
 ---
 
 ## 📋 Tabela de Conteúdos
 
-- [Sobre o Projeto](#-sobre-o-projeto)
-- [✨ Core Features](#-core-features)
-- [🧠 Como o Bot "Pensa"? (A Estratégia)](#-como-o-bot-pensa-a-estratégia)
-- [⚙️ O Ecossistema do Bot: Como os Módulos Interagem](#️-o-ecossistema-do-bot-como-os-módulos-interagem)
-- [🚀 Começando](#-começando)
+- [🌟 Sobre o Projeto](#-sobre-o-projeto)
+- [✨ Features de Destaque](#-features-de-destaque)
+- [🧠 A Filosofia do Bot: Como Ele Pensa?](#-a-filosofia-do-bot-como-ele-pensa)
+- [⚙️ Ecossistema do Bot: Como os Módulos Interagem](#️-ecossistema-do-bot-como-os-módulos-interagem)
+- [🚀 Guia de Início Rápido](#-guia-de-início-rápido)
   - [Pré-requisitos](#pré-requisitos)
   - [Instalação](#instalação)
 - [🔧 Configuração do Ambiente (`.env`)](#-configuração-do-ambiente-env)
-- [▶️ Como Usar (Workflow Profissional)](#️-como-usar-workflow-profissional)
-  - [Fase 1: Otimização (`optimize`)](#fase-1-otimização-optimize)
-  - [Fase 2: Backtest Rápido (`backtest`)](#fase-2-backtest-rápido-backtest)
-  - [Fase 3: Validação em Testnet (`test`)](#fase-3-validação-em-testnet-test)
-  - [Fase 4: Produção (`trade`)](#fase-4-produção-trade)
-  - [Comandos Adicionais](#comandos-adicionais)
+- [▶️ O Workflow Profissional: Como Usar](#️-o-workflow-profissional-como-usar)
+  - [Fase 1: Pesquisa e Otimização (`optimize`)](#fase-1-pesquisa-e-otimização-optimize)
+  - [Fase 2: Validação Fora da Amostra (`backtest`)](#fase-2-validação-fora-da-amostra-backtest)
+  - [Fase 3: Operação em Ambiente de Teste (`test`)](#fase-3-operação-em-ambiente-de-teste-test)
+  - [Fase 4: Operação em Produção (`trade`)](#fase-4-operação-em-produção-trade)
+  - [Comandos de Gerenciamento](#comandos-de-gerenciamento)
 - [📂 Estrutura do Projeto](#-estrutura-do-projeto)
 - [📜 Licença](#-licença)
 
 ---
 
-## 🤖 Sobre o Projeto
+## 🌟 Sobre o Projeto
 
-Este não é um bot de trading comum. Ele foi projetado para tomar decisões baseadas em dados e estatísticas, não em regras fixas. O sistema utiliza um pipeline completo de Machine Learning e um gerenciador de portfólio para:
+Este repositório contém um sistema de trading algorítmico completo, projetado para ser robusto, inteligente e metodologicamente correto. Diferente de bots baseados em regras fixas, o gcsBot utiliza um modelo de **Machine Learning (LightGBM)** para encontrar padrões preditivos e uma arquitetura sofisticada para se adaptar às dinâmicas do mercado.
 
-1.  **Aprender** com um vasto histórico de dados de mercado para prever oportunidades.
-2.  **Gerenciar o Risco** de forma dinâmica, ajustando o tamanho de cada operação com base no capital disponível.
-3.  **Otimizar** seus próprios parâmetros através de um processo robusto de Walk-Forward Optimization (WFO).
-4.  **Validar** a estratégia otimizada em dados futuros "não vistos" para garantir a robustez.
-5.  **Operar** de forma autônoma nos ambientes de Teste (Testnet) ou Produção (Conta Real) da Binance.
-
-O objetivo é encontrar e explorar ineficiências no mercado, combinando análise técnica e macroeconômica, sempre sob uma camada de gestão de capital disciplinada.
+O núcleo do projeto é um processo de **Walk-Forward Optimization (WFO)** que garante que a estratégia seja constantemente reavaliada e otimizada em dados novos, evitando o overfitting e a estagnação. O resultado é um agente autônomo que não apenas opera, mas aprende e se ajusta.
 
 ---
 
-## ✨ Core Features
+## ✨ Features de Destaque
 
-- **🧠 Modelo Preditivo (LightGBM):** Utiliza um modelo de Gradient Boosting rápido e eficiente para encontrar padrões nos dados.
-- **💼 Gestão de Portfólio Dinâmica:** Gerencia o capital de forma inteligente, separando fundos para holding e para trading, com cálculo de risco percentual dinâmico por operação.
-- **🔍 Otimização de Hiperparâmetros (Optuna):** Encontra a melhor combinação de parâmetros para o modelo e para a estratégia em cada janela de tempo.
-- **🛡️ Walk-Forward Optimization (WFO):** A metodologia de backtesting mais robusta, que simula o desempenho do bot em condições de mercado dinâmicas, forçando-o a se adaptar continuamente.
-- **ρεαλισμός Backtest Realista:** A simulação de backtest inclui **custos operacionais** (taxas e slippage) e é livre de **look-ahead bias**, garantindo que os resultados da otimização sejam honestos.
-- **💵 Integração de Dados Macroeconômicos:** Incorpora a variação horária de múltiplos indicadores (DXY, VIX, Ouro, Títulos de 10 anos) como features para um rico contexto de mercado.
-- **🚀 Cache Inteligente de Dados:** Salva os dados pré-processados e unificados, permitindo uma inicialização quase instantânea nas execuções seguintes e viabilizando o modo offline.
-- **🔌 Modo Offline Robusto:** Permite rodar a otimização inteira sem conexão com a internet (usando dados locais e de cache) e possui travas de segurança que impedem o início dos modos de trade real/teste se a internet não estiver disponível.
-- **🐳 Deployment com Docker:** Empacotado em um container Docker para um deployment fácil, portátil e consistente entre diferentes máquinas.
-- **▶️ Orquestrador Inteligente (`run.py`):** Um ponto de entrada único que gerencia todo o ciclo de vida do bot, desde a instalação até a execução dos diferentes modos.
-- **📝 Logging Detalhado:** Sistema de logs inteligente que registra não apenas os trades, mas o estado completo do portfólio e o progresso da otimização.
+- **🧠 Inteligência Autoadaptativa:**
 
----
+  - **Confiança Dinâmica:** O bot ajusta sua própria "coragem" (`prediction_confidence`) com base em seus lucros e prejuízos recentes, tornando-se mais ousado em sequências de vitórias e mais cauteloso após perdas.
+  - **Risco Dinâmico (Bet Sizing):** O tamanho de cada operação é proporcional à convicção do modelo no sinal, arriscando mais em oportunidades de alta probabilidade.
+  - **Otimização da Personalidade:** O sistema utiliza `Optuna` para encontrar não apenas os melhores parâmetros de modelo, mas a melhor "personalidade" para o bot, incluindo seu apetite de risco e velocidade de aprendizado.
 
-## 🧠 Como o Bot "Pensa"? (A Estratégia)
+- **🤖 Metodologia de Nível Profissional:**
 
-O bot é um especialista em encontrar **padrões numéricos** nos dados de mercado. Ele analisa uma combinação de "impressões digitais" (features) de volatilidade, tendência, momento e macroeconomia para tomar uma decisão. Quando o modelo encontra um padrão com alta probabilidade estatística de sucesso, ele passa a decisão para o **Gerenciador de Portfólio**, que calcula o tamanho exato da posição com base nas regras de risco definidas, garantindo que nenhuma operação individual possa comprometer o capital total.
+  - **Validação Robusta (Train/Validate/Test):** O processo de otimização utiliza uma metodologia rigorosa que impede o vazamento de dados do futuro (_look-ahead bias_), garantindo que os resultados dos testes sejam honestos.
+  - **Rotulagem de 3 Classes (Buy/Sell/Hold):** O modelo aprende a identificar mercados laterais e a ficar de fora, reduzindo trades desnecessários e focando em sinais de alta qualidade.
+  - **Análise de Regime de Mercado:** O bot utiliza features de longo prazo (`SMA200`, `ATR`) para entender o contexto do mercado (tendência vs. lateralidade, alta vs. baixa volatilidade) antes de tomar decisões.
 
----
-
-## ⚙️ O Ecossistema do Bot: Como os Módulos Interagem
-
-O bot opera em diferentes modos, utilizando combinações específicas de arquivos.
-
-#### Modo de Otimização (`optimize`)
-
-Neste modo, o bot está em seu "laboratório de pesquisa".
-
-- **`optimizer.py`**: É o cérebro da operação. Ele gerencia o processo de Walk-Forward.
-- **`model_trainer.py`**: É chamado pelo otimizador para treinar um novo modelo a cada ciclo.
-- **`backtest.py`**: Para cada modelo treinado, executa uma simulação realista. O resultado (Sharpe Ratio) é devolvido ao otimizador.
-- **Resultado Final:** A criação dos arquivos `trading_model.pkl`, `scaler.pkl` e `strategy_params.json` na pasta `/data`.
-
-#### Modo de Backtest Rápido (`backtest`)
-
-Um modo de validação para testar o modelo mais recente em um período futuro.
-
-- **`quick_tester.py`**: O módulo principal deste modo. Ele carrega os arquivos gerados pela otimização.
-- **Simulação Realista:** Executa uma simulação vela a vela no período de teste definido, usando a mesma lógica de gestão de portfólio do modo de trade real.
-- **Resultado Final:** Um relatório detalhado de performance mês a mês impresso no terminal.
-
-#### Modos de Operação (`test` e `trade`)
-
-Neste modo, o bot está "em campo", operando no mercado ao vivo.
-
-- **`trading_bot.py`**: É o único módulo ativo. Ele é o piloto.
-- **`PortfolioManager`**: Uma classe dentro do `trading_bot.py` que gerencia ativamente o capital, calcula o tamanho das posições e protege a carteira.
-- **Conexão com a Binance**: Usa as chaves de API para enviar ordens para a Testnet (modo `test`) ou para a conta real (modo `trade`).
+- **⚙️ Engenharia de Ponta:**
+  - **Backtest Realista:** Todas as simulações incluem custos operacionais (taxas de `0.1%` e derrapagem de `0.05%`) para uma avaliação de performance fiel à realidade.
+  - **Integração de Dados Macroeconômicos:** Utiliza a variação de indicadores como DXY (dólar), VIX (volatilidade), Ouro e Títulos de 10 anos para um contexto de mercado mais rico.
+  - **Deployment com Docker:** Ambiente 100% conteinerizado para uma execução consistente e livre de problemas de dependências.
+  - **Cache Inteligente e Modo Offline:** Processa e armazena dados para inicializações futuras quase instantâneas e permite rodar o modo de otimização completamente offline.
 
 ---
 
-## 🚀 Começando
+## 🧠 A Filosofia do Bot: Como Ele Pensa?
+
+A tomada de decisão do gcsBot segue uma hierarquia de inteligência em quatro etapas:
+
+1.  **Contexto (O Cenário):** Primeiro, o bot analisa o **regime de mercado**. "Estamos em uma tendência de alta ou de baixa? A volatilidade está alta ou baixa?" Isso é feito através das features de regime (`regime_tendencia`, `regime_volatilidade`).
+
+2.  **Sinal (A Oportunidade):** Dentro desse contexto, o modelo de Machine Learning busca por um **padrão preditivo** de curto prazo, uma ineficiência que sugira uma oportunidade de compra.
+
+3.  **Convicção (A Coragem):** Uma vez que um sinal é encontrado, o bot consulta seu **nível de confiança adaptativo**. "Baseado na minha performance recente, eu deveria arriscar neste sinal ou é melhor ter paciência?"
+
+4.  **Ação (O Tamanho da Posição):** Se a convicção for alta o suficiente, o bot calcula o **tamanho do risco** a ser tomado, proporcional à força do sinal. Um sinal "ok" recebe uma alocação pequena; um sinal "perfeito" recebe uma alocação maior.
+
+Este processo transforma o bot de um simples executor de regras em um agente estratégico que pensa em múltiplas camadas.
+
+---
+
+## ⚙️ Ecossistema do Bot: Como os Módulos Interagem
+
+- **`optimizer.py`**: O cérebro da pesquisa. Gerencia o WFO, chama o `model_trainer` e o `backtest`, e usa o `Optuna` para encontrar os melhores parâmetros.
+- **`model_trainer.py`**: O "cientista de dados". Prepara todas as features (técnicas, macro e de regime) e treina o modelo LightGBM.
+- **`confidence_manager.py`**: O "psicólogo" do bot. Implementa a lógica para ajustar a confiança com base nos resultados.
+- **`backtest.py`**: O simulador. Executa a estratégia de forma realista, utilizando o `confidence_manager` para testar o desempenho da estratégia adaptativa.
+- **`quick_tester.py`**: O "auditor". Permite validar um modelo já treinado em um período de tempo futuro completamente novo.
+- **`trading_bot.py`**: O "piloto". Módulo que opera no mercado real, utilizando os artefatos (`.pkl`, `.json`) gerados pela otimização.
+
+---
+
+## 🚀 Guia de Início Rápido
 
 Siga estes passos para colocar o bot em funcionamento.
 
 ### Pré-requisitos
 
-- [Python 3.10+](https://www.python.org/downloads/)
+- [Python 3.11+](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/downloads)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (em execução)
 
 ### Instalação
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/giakomogcs/gcsbot-btc.git](https://github.com/giakomogcs/gcsbot-btc.git)
+    git clone [https://github.com/SEU_USUARIO/gcsbot-btc.git](https://github.com/SEU_USUARIO/gcsbot-btc.git)
     cd gcsbot-btc
     ```
 2.  **Execute o Setup Automático:**
+    Este comando irá verificar o ambiente, instalar as dependências e criar o seu arquivo de configuração `.env`.
+
     ```bash
     python run.py setup
     ```
-    ⚠️ **Atenção:** Este comando criará um arquivo `.env`. **Você deve abri-lo e preencher todas as variáveis necessárias.**
+
+    > ⚠️ **Atenção:** Após o setup, abra o arquivo `.env` recém-criado e preencha **todas** as variáveis, especialmente suas chaves de API.
+
 3.  **Construa a Imagem Docker:**
     ```bash
     python run.py build
@@ -127,26 +121,25 @@ Siga estes passos para colocar o bot em funcionamento.
 
 O arquivo `.env` é o painel de controle principal do bot.
 
-- **`MODE`**: Define o modo de operação. Use `optimize`, `backtest`, `test`, ou `trade`.
-- **`SYMBOL`**: O par de moedas a ser operado (ex: `BTCUSDT`).
-- **`FORCE_OFFLINE_MODE`**: `True` ou `False`. Se `True`, o bot não tentará nenhuma conexão com a internet e usará apenas dados locais/em cache. Impede a execução dos modos `test` e `trade`.
+- **`MODE`**: Modo de operação: `optimize`, `backtest`, `test`, ou `trade`.
+- **`FORCE_OFFLINE_MODE`**: `True` ou `False`. Impede o bot de acessar a internet (útil para otimizações).
 
 #### Chaves de API
 
-- `BINANCE_API_KEY` & `BINANCE_API_SECRET`: Suas chaves da conta **real**.
-- `BINANCE_TESTNET_API_KEY` & `BINANCE_TESTNET_API_SECRET`: Suas chaves da conta **Testnet**.
+- `BINANCE_API_KEY` & `BINANCE_API_SECRET`: Chaves da conta **real**.
+- `BINANCE_TESTNET_API_KEY` & `BINANCE_TESTNET_API_SECRET`: Chaves da conta **Testnet**.
 
-#### Gestão de Portfólio
+#### Gestão de Portfólio (Para os modos `test` e `trade`)
 
 - `MAX_USDT_ALLOCATION`: O **MÁXIMO** de capital em USDT que o bot tem permissão para gerenciar.
-- `LONG_TERM_HOLD_PCT`: Percentual do capital que será usado para comprar e manter BTC como holding. Ex: `0.50` para 50%.
-- `RISK_PER_TRADE_PCT`: Do capital de **trading** restante, qual a porcentagem de risco por operação? Ex: `0.02` para arriscar 2%.
+- `LONG_TERM_HOLD_PCT`: Percentual do capital para holding de longo prazo (ex: `0.50` para 50%).
 
-#### Backtest Rápido
+#### Parâmetros de Backtest e Fallback
 
-- `BACKTEST_START_DATE` & `BACKTEST_END_DATE`: Define o período para a simulação do modo `backtest`. Ex: `2025-01-01`.
+- `RISK_PER_TRADE_PCT`: **Fallback** do risco por operação, caso o valor não seja encontrado nos parâmetros otimizados.
+- `BACKTEST_START_DATE` & `BACKTEST_END_DATE`: Período para a simulação do modo `backtest`.
 
-> ⚠️ **Nunca compartilhe ou envie seu arquivo `.env` para repositórios públicos!**
+> ⚠️ **NUNCA** envie seu arquivo `.env` para repositórios públicos! O `.gitignore` já está configurado para ignorá-lo.
 
 ---
 
@@ -226,19 +219,20 @@ gcsbot-btc/
 ├── logs/                  # Arquivos de log diários - Ignorado pelo Git
 ├── src/                   # Código fonte do projeto
 │   ├── __init__.py
-│   ├── backtest.py        # Módulo de backtesting para a otimização
-│   ├── config.py          # Carrega e gerencia as configurações
-│   ├── data_manager.py    # Gerencia a coleta, unificação e cache de dados
+│   ├── backtest.py        # Motor de simulação realista (usado pela otimização)
+│   ├── config.py          # Gerenciador de configurações do .env
+│   ├── confidence_manager.py # Cérebro da confiança adaptativa
+│   ├── data_manager.py    # Gerenciador de coleta e cache de dados
 │   ├── logger.py          # Configuração do sistema de logs
 │   ├── model_trainer.py   # Prepara features e treina o modelo de ML
-│   ├── optimizer.py       # Orquestra o Walk-Forward Optimization
-│   ├── quick_tester.py    # Lógica para o modo de backtest rápido
-│   └── trading_bot.py     # Lógica de operação e gestão de portfólio
+│   ├── optimizer.py       # Orquestrador do Walk-Forward Optimization (WFO)
+│   ├── quick_tester.py    # Lógica para o modo de backtest rápido (validação)
+│   └── trading_bot.py     # Lógica de operação real e gestão de portfólio
 ├── .dockerignore          # Arquivos a serem ignorados pelo Docker
 ├── .env.example           # Exemplo do arquivo de configuração
 ├── .gitignore             # Arquivos a serem ignorados pelo Git
 ├── Dockerfile             # Define o ambiente Docker para o bot
-├── main.py                # Ponto de entrada (usado pelo Docker)
+├── main.py                # Ponto de entrada principal (usado pelo Docker)
 ├── README.md              # Esta documentação
 ├── requirements.txt       # Dependências Python
 └── run.py                 # Orquestrador principal e ponto de entrada do usuário

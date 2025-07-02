@@ -1,4 +1,4 @@
-# src/quick_tester.py (VERSÃO COM RISCO DINÂMICO)
+# src/quick_tester.py (VERSÃO FINAL COM INTELIGÊNCIA ADAPTATIVA)
 
 import json
 import pandas as pd
@@ -7,9 +7,11 @@ import joblib
 from tabulate import tabulate
 
 from src.logger import logger
-from src.config import MODEL_FILE, SCALER_FILE, STRATEGY_PARAMS_FILE, RISK_PER_TRADE_PCT, SYMBOL
+from src.config import MODEL_FILE, SCALER_FILE, STRATEGY_PARAMS_FILE, SYMBOL
 from src.data_manager import DataManager
 from src.model_trainer import ModelTrainer
+# <<< PASSO 1: Importar o cérebro adaptativo >>>
+from src.confidence_manager import AdaptiveConfidenceManager
 
 # Constantes de custo para a simulação
 FEE_RATE = 0.001
@@ -17,8 +19,9 @@ SLIPPAGE_RATE = 0.0005
 
 class QuickTester:
     """
-    Realiza um backtest de um modelo treinado em um período de tempo específico,
-    simulando a gestão de portfólio com risco dinâmico e gerando um relatório de performance.
+    Realiza um backtest de validação (out-of-sample) de um modelo treinado,
+    simulando a gestão de confiança adaptativa e risco dinâmico para gerar
+    um relatório de performance completo.
     """
     def __init__(self):
         self.data_manager = DataManager()
@@ -28,14 +31,12 @@ class QuickTester:
         self.strategy_params = {}
 
     def load_model_and_params(self):
-        """Carrega o modelo, normalizador e parâmetros salvos pela otimização."""
+        """Carrega o modelo, normalizador e TODOS os parâmetros otimizados."""
         try:
             self.model = joblib.load(MODEL_FILE)
             self.scaler = joblib.load(SCALER_FILE)
             with open(STRATEGY_PARAMS_FILE, 'r') as f:
                 self.strategy_params = json.load(f)
-            # Adiciona o risco base aos parâmetros para consistência
-            self.strategy_params['risk_per_trade_pct'] = RISK_PER_TRADE_PCT
             logger.info("✅ Modelo, normalizador e parâmetros da estratégia carregados com sucesso.")
             return True
         except FileNotFoundError as e:
@@ -51,7 +52,6 @@ class QuickTester:
         df = pd.DataFrame(portfolio_history).set_index('timestamp')
         df['pnl'] = df['value'].diff()
         
-        # Agrupa os resultados por mês
         monthly_report = df.resample('M').agg(
             start_capital=pd.NamedAgg(column='value', aggfunc='first'),
             end_capital=pd.NamedAgg(column='value', aggfunc='last'),
@@ -69,7 +69,7 @@ class QuickTester:
         report_data['pnl_pct'] = report_data['pnl_pct'].apply(lambda x: f"{x:,.2f}%")
 
         logger.info("\n\n" + "="*80)
-        logger.info("--- RELATÓRIO DE PERFORMANCE DO BACKTEST ---")
+        logger.info("--- RELATÓRIO DE PERFORMANCE DO BACKTEST (OUT-OF-SAMPLE) ---")
         print(tabulate(report_data, headers='keys', tablefmt='pipe', showindex=False))
         
         initial = df['value'].iloc[0]
@@ -82,7 +82,7 @@ class QuickTester:
         logger.info(f"Período Testado: {df.index.min():%Y-%m-%d} a {df.index.max():%Y-%m-%d}")
         logger.info(f"Capital Inicial: ${initial:,.2f}")
         logger.info(f"Capital Final: ${final:,.2f}")
-        logger.info(f"Lucro/Prejuízo Total: ${total_pnl:,.2f} ({total_pnl_pct:,.2f}%)")
+        logger.info(f"Lucro/Prejuízo Total: ${total_pnl:,.2f} ({total_pnl_pct:+.2f}%)")
         logger.info(f"Total de Trades Executados: {int(total_trades)}")
         logger.info("="*80)
 
@@ -111,7 +111,14 @@ class QuickTester:
         in_position = False
         buy_price = 0.0
         portfolio_history = []
-        base_risk_per_trade = self.strategy_params.get('risk_per_trade_pct', RISK_PER_TRADE_PCT)
+        
+        # <<< PASSO 2: Carregar os parâmetros otimizados corretos >>>
+        base_risk_per_trade = self.strategy_params.get('risk_per_trade_pct')
+        initial_conf = self.strategy_params.get('initial_confidence')
+        learning_rate = self.strategy_params.get('confidence_learning_rate')
+        
+        # <<< PASSO 3: Instanciar o cérebro adaptativo >>>
+        confidence_manager = AdaptiveConfidenceManager(initial_confidence=initial_conf, learning_rate=learning_rate)
         
         logger.info("Iniciando simulação de trading no período de teste...")
         for date, row in test_features.iterrows():
@@ -126,26 +133,31 @@ class QuickTester:
                     sell_price = price * (1 - SLIPPAGE_RATE)
                     revenue = btc_amount * sell_price
                     capital += revenue * (1 - FEE_RATE)
+                    
+                    # <<< PASSO 4: Atualizar o cérebro após cada trade >>>
+                    pnl_do_trade = (sell_price / buy_price) - 1
+                    confidence_manager.update(pnl_do_trade)
+
                     btc_amount, in_position, trade_executed_this_step = 0.0, False, 1
             
-            elif predictions_buy_proba.get(date, 0) > self.strategy_params['prediction_confidence']:
-                
-                # --- NOVA LÓGICA DE RISCO DINÂMICO ---
+            else:
+                # <<< PASSO 5: Usar a confiança dinâmica para tomar a decisão >>>
+                current_confidence_threshold = confidence_manager.get_confidence()
                 conviction = predictions_buy_proba.get(date, 0)
-                min_conf = self.strategy_params['prediction_confidence']
-                signal_strength = (conviction - min_conf) / (1.0 - min_conf)
-                dynamic_risk_pct = base_risk_per_trade * (0.5 + signal_strength)
-                trade_size_usdt = capital * dynamic_risk_pct
-                # --- FIM DA LÓGICA ---
 
-                if capital > 10 and trade_size_usdt > 10:
-                    buy_price_eff = price * (1 + SLIPPAGE_RATE)
-                    amount_to_buy_btc = trade_size_usdt / buy_price_eff
-                    fee = trade_size_usdt * FEE_RATE
+                if conviction > current_confidence_threshold:
+                    signal_strength = (conviction - current_confidence_threshold) / (1.0 - current_confidence_threshold)
+                    dynamic_risk_pct = base_risk_per_trade * (0.5 + signal_strength)
+                    trade_size_usdt = capital * dynamic_risk_pct
                     
-                    btc_amount = amount_to_buy_btc
-                    capital -= (trade_size_usdt + fee)
-                    buy_price, in_position, trade_executed_this_step = buy_price_eff, True, 1
+                    if capital > 10 and trade_size_usdt > 10:
+                        buy_price_eff = price * (1 + SLIPPAGE_RATE)
+                        amount_to_buy_btc = trade_size_usdt / buy_price_eff
+                        fee = trade_size_usdt * FEE_RATE
+                        
+                        btc_amount = amount_to_buy_btc
+                        capital -= (trade_size_usdt + fee)
+                        buy_price, in_position, trade_executed_this_step = buy_price_eff, True, 1
             
             current_value = capital + (btc_amount * price)
             portfolio_history.append({'timestamp': date, 'value': current_value, 'trade_executed': trade_executed_this_step})
