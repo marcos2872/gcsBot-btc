@@ -1,4 +1,4 @@
-# src/quick_tester.py
+# src/quick_tester.py (VERSÃO COM RISCO DINÂMICO)
 
 import json
 import pandas as pd
@@ -18,7 +18,7 @@ SLIPPAGE_RATE = 0.0005
 class QuickTester:
     """
     Realiza um backtest de um modelo treinado em um período de tempo específico,
-    simulando a gestão de portfólio e gerando um relatório de performance.
+    simulando a gestão de portfólio com risco dinâmico e gerando um relatório de performance.
     """
     def __init__(self):
         self.data_manager = DataManager()
@@ -34,6 +34,8 @@ class QuickTester:
             self.scaler = joblib.load(SCALER_FILE)
             with open(STRATEGY_PARAMS_FILE, 'r') as f:
                 self.strategy_params = json.load(f)
+            # Adiciona o risco base aos parâmetros para consistência
+            self.strategy_params['risk_per_trade_pct'] = RISK_PER_TRADE_PCT
             logger.info("✅ Modelo, normalizador e parâmetros da estratégia carregados com sucesso.")
             return True
         except FileNotFoundError as e:
@@ -41,7 +43,7 @@ class QuickTester:
             return False
 
     def generate_report(self, portfolio_history):
-        """Gera e imprime um relatório de performance mensal."""
+        """Gera e imprime um relatório de performance mensal e geral."""
         if not portfolio_history:
             logger.warning("Histórico de portfólio vazio. Não é possível gerar relatório.")
             return
@@ -58,12 +60,10 @@ class QuickTester:
         )
         monthly_report['pnl_pct'] = (monthly_report['end_capital'] / monthly_report['start_capital'] - 1) * 100
         
-        # Formatação para exibição
         monthly_report.index = monthly_report.index.strftime('%Y-%m')
         report_data = monthly_report.reset_index()
         report_data.rename(columns={'index': 'Mês'}, inplace=True)
         
-        # Formata colunas para melhor leitura
         for col in ['start_capital', 'end_capital', 'total_pnl']:
             report_data[col] = report_data[col].apply(lambda x: f"${x:,.2f}")
         report_data['pnl_pct'] = report_data['pnl_pct'].apply(lambda x: f"{x:,.2f}%")
@@ -72,11 +72,10 @@ class QuickTester:
         logger.info("--- RELATÓRIO DE PERFORMANCE DO BACKTEST ---")
         print(tabulate(report_data, headers='keys', tablefmt='pipe', showindex=False))
         
-        # Resumo Geral
         initial = df['value'].iloc[0]
         final = df['value'].iloc[-1]
         total_pnl = final - initial
-        total_pnl_pct = (final / initial - 1) * 100
+        total_pnl_pct = (final / initial - 1) * 100 if initial > 0 else 0
         total_trades = df['trade_executed'].sum()
         
         logger.info("\n--- RESUMO GERAL ---")
@@ -84,7 +83,7 @@ class QuickTester:
         logger.info(f"Capital Inicial: ${initial:,.2f}")
         logger.info(f"Capital Final: ${final:,.2f}")
         logger.info(f"Lucro/Prejuízo Total: ${total_pnl:,.2f} ({total_pnl_pct:,.2f}%)")
-        logger.info(f"Total de Trades Executados: {total_trades}")
+        logger.info(f"Total de Trades Executados: {int(total_trades)}")
         logger.info("="*80)
 
     def run(self, start_date_str: str, end_date_str: str, initial_capital: float = 1000.0):
@@ -102,27 +101,25 @@ class QuickTester:
 
         test_features = self.trainer._prepare_features(test_data.copy())
         
-        # Prepara as predições para todo o período de uma vez (otimização de velocidade)
         X_test_scaled_np = self.scaler.transform(test_features[self.trainer.feature_names])
         X_test_scaled_df = pd.DataFrame(X_test_scaled_np, index=test_features.index, columns=self.trainer.feature_names)
         predictions_proba = self.model.predict_proba(X_test_scaled_df)
         predictions_buy_proba = pd.Series(predictions_proba[:, 1], index=test_features.index)
 
-        # Inicia a simulação
         capital = initial_capital
         btc_amount = 0.0
         in_position = False
         buy_price = 0.0
         portfolio_history = []
+        base_risk_per_trade = self.strategy_params.get('risk_per_trade_pct', RISK_PER_TRADE_PCT)
         
         logger.info("Iniciando simulação de trading no período de teste...")
         for date, row in test_features.iterrows():
             price = row['close']
             trade_executed_this_step = 0
 
-            # Lógica de SAÍDA da posição
             if in_position:
-                pnl_pct = (price / buy_price) - 1
+                pnl_pct = (price / buy_price) - 1 if buy_price > 0 else 0
                 if (pnl_pct >= self.strategy_params['profit_threshold'] or 
                     pnl_pct <= -self.strategy_params['stop_loss_threshold']):
                     
@@ -131,9 +128,16 @@ class QuickTester:
                     capital += revenue * (1 - FEE_RATE)
                     btc_amount, in_position, trade_executed_this_step = 0.0, False, 1
             
-            # Lógica de ENTRADA na posição
             elif predictions_buy_proba.get(date, 0) > self.strategy_params['prediction_confidence']:
-                trade_size_usdt = capital * RISK_PER_TRADE_PCT
+                
+                # --- NOVA LÓGICA DE RISCO DINÂMICO ---
+                conviction = predictions_buy_proba.get(date, 0)
+                min_conf = self.strategy_params['prediction_confidence']
+                signal_strength = (conviction - min_conf) / (1.0 - min_conf)
+                dynamic_risk_pct = base_risk_per_trade * (0.5 + signal_strength)
+                trade_size_usdt = capital * dynamic_risk_pct
+                # --- FIM DA LÓGICA ---
+
                 if capital > 10 and trade_size_usdt > 10:
                     buy_price_eff = price * (1 + SLIPPAGE_RATE)
                     amount_to_buy_btc = trade_size_usdt / buy_price_eff
