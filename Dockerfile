@@ -18,7 +18,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Instala as dependências Python
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org --no-cache-dir -r requirements.txt
 
 # Copia todo o resto do código do seu projeto para dentro do container
 COPY . .

@@ -11,3 +11,4 @@ ta
 numba
 yfinance
 lightgbm
+tabulate
